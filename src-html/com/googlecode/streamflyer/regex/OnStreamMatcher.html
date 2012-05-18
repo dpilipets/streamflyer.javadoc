@@ -68,56 +68,60 @@
 <FONT color="green">065</FONT>     * stream including the method {@link #findUnlessHitEnd(int, int)}.<a name="line.65"></a>
 <FONT color="green">066</FONT>     * <a name="line.66"></a>
 <FONT color="green">067</FONT>     * @author rwoo<a name="line.67"></a>
-<FONT color="green">068</FONT>     * <a name="line.68"></a>
-<FONT color="green">069</FONT>     * @since 20.06.2011<a name="line.69"></a>
-<FONT color="green">070</FONT>     */<a name="line.70"></a>
-<FONT color="green">071</FONT>    public interface OnStreamMatcher extends MatchResult {<a name="line.71"></a>
-<FONT color="green">072</FONT>    <a name="line.72"></a>
-<FONT color="green">073</FONT>        /**<a name="line.73"></a>
-<FONT color="green">074</FONT>         * @see Matcher#reset(CharSequence)<a name="line.74"></a>
-<FONT color="green">075</FONT>         */<a name="line.75"></a>
-<FONT color="green">076</FONT>        public void reset(CharSequence input);<a name="line.76"></a>
-<FONT color="green">077</FONT>    <a name="line.77"></a>
-<FONT color="green">078</FONT>        /**<a name="line.78"></a>
-<FONT color="green">079</FONT>         * Looks for the first position that could be the start of a match that<a name="line.79"></a>
-<FONT color="green">080</FONT>         * starts in the range [ &lt;code&gt;from&lt;/code&gt; (including), &lt;code&gt;maxFrom&lt;/code&gt;<a name="line.80"></a>
-<FONT color="green">081</FONT>         * (including)]. If such a position is found, then the method stops and<a name="line.81"></a>
-<FONT color="green">082</FONT>         * returns true if the input provides enough characters to make a match.<a name="line.82"></a>
-<FONT color="green">083</FONT>         * &lt;p&gt;<a name="line.83"></a>
-<FONT color="green">084</FONT>         * ATTENTION! maxFrom can be the position behind(!) the last character of<a name="line.84"></a>
-<FONT color="green">085</FONT>         * the input.<a name="line.85"></a>
-<FONT color="green">086</FONT>         * &lt;p&gt;<a name="line.86"></a>
-<FONT color="green">087</FONT>         * This first position can retrieved via {@link #lastFrom()}.<a name="line.87"></a>
-<FONT color="green">088</FONT>         * <a name="line.88"></a>
-<FONT color="green">089</FONT>         * @param minFrom<a name="line.89"></a>
-<FONT color="green">090</FONT>         * @param maxFrom<a name="line.90"></a>
-<FONT color="green">091</FONT>         * @return Returns true if the method found a match at the position<a name="line.91"></a>
-<FONT color="green">092</FONT>         *         {@link #lastFrom()}.<a name="line.92"></a>
-<FONT color="green">093</FONT>         */<a name="line.93"></a>
-<FONT color="green">094</FONT>        public boolean findUnlessHitEnd(int minFrom, int maxFrom);<a name="line.94"></a>
-<FONT color="green">095</FONT>    <a name="line.95"></a>
-<FONT color="green">096</FONT>        /**<a name="line.96"></a>
-<FONT color="green">097</FONT>         * @see Matcher#hitEnd()<a name="line.97"></a>
-<FONT color="green">098</FONT>         */<a name="line.98"></a>
-<FONT color="green">099</FONT>        public boolean hitEnd();<a name="line.99"></a>
-<FONT color="green">100</FONT>    <a name="line.100"></a>
-<FONT color="green">101</FONT>        /**<a name="line.101"></a>
-<FONT color="green">102</FONT>         * @see Matcher#requireEnd()<a name="line.102"></a>
-<FONT color="green">103</FONT>         */<a name="line.103"></a>
-<FONT color="green">104</FONT>        public boolean requireEnd();<a name="line.104"></a>
-<FONT color="green">105</FONT>    <a name="line.105"></a>
-<FONT color="green">106</FONT>        /**<a name="line.106"></a>
-<FONT color="green">107</FONT>         * This property is set by calling {@link #findUnlessHitEnd(int, int)} .<a name="line.107"></a>
-<FONT color="green">108</FONT>         * &lt;p&gt;<a name="line.108"></a>
-<FONT color="green">109</FONT>         * ATTENTION! This property returns maxFrom + 1, if<a name="line.109"></a>
-<FONT color="green">110</FONT>         * {@link #findUnlessHitEnd(int, int)} neither has found a match nor does it<a name="line.110"></a>
-<FONT color="green">111</FONT>         * hit the end of input.<a name="line.111"></a>
-<FONT color="green">112</FONT>         * <a name="line.112"></a>
-<FONT color="green">113</FONT>         * @return Returns the last position {@link #findUnlessHitEnd(int, int)} has<a name="line.113"></a>
-<FONT color="green">114</FONT>         *         investigated before it returned.<a name="line.114"></a>
-<FONT color="green">115</FONT>         */<a name="line.115"></a>
-<FONT color="green">116</FONT>        public int lastFrom();<a name="line.116"></a>
-<FONT color="green">117</FONT>    }<a name="line.117"></a>
+<FONT color="green">068</FONT>     * @since 20.06.2011<a name="line.68"></a>
+<FONT color="green">069</FONT>     */<a name="line.69"></a>
+<FONT color="green">070</FONT>    public interface OnStreamMatcher extends MatchResult {<a name="line.70"></a>
+<FONT color="green">071</FONT>    <a name="line.71"></a>
+<FONT color="green">072</FONT>        /**<a name="line.72"></a>
+<FONT color="green">073</FONT>         * @see Matcher#reset(CharSequence)<a name="line.73"></a>
+<FONT color="green">074</FONT>         */<a name="line.74"></a>
+<FONT color="green">075</FONT>        public void reset(CharSequence input);<a name="line.75"></a>
+<FONT color="green">076</FONT>    <a name="line.76"></a>
+<FONT color="green">077</FONT>        /**<a name="line.77"></a>
+<FONT color="green">078</FONT>         * Looks for the first position that could be the start of a match that<a name="line.78"></a>
+<FONT color="green">079</FONT>         * starts in the range [ &lt;code&gt;from&lt;/code&gt; (including), &lt;code&gt;maxFrom&lt;/code&gt;<a name="line.79"></a>
+<FONT color="green">080</FONT>         * (including)]. If such a position is found, then the method stops and<a name="line.80"></a>
+<FONT color="green">081</FONT>         * returns true if the input provides enough characters to make a match.<a name="line.81"></a>
+<FONT color="green">082</FONT>         * &lt;p&gt;<a name="line.82"></a>
+<FONT color="green">083</FONT>         * ATTENTION! maxFrom can be the position behind(!) the last character of<a name="line.83"></a>
+<FONT color="green">084</FONT>         * the input.<a name="line.84"></a>
+<FONT color="green">085</FONT>         * &lt;p&gt;<a name="line.85"></a>
+<FONT color="green">086</FONT>         * This first position can retrieved via {@link #lastFrom()}.<a name="line.86"></a>
+<FONT color="green">087</FONT>         * <a name="line.87"></a>
+<FONT color="green">088</FONT>         * @param minFrom<a name="line.88"></a>
+<FONT color="green">089</FONT>         * @param maxFrom<a name="line.89"></a>
+<FONT color="green">090</FONT>         * @return Returns true if the method found a match at the position<a name="line.90"></a>
+<FONT color="green">091</FONT>         *         {@link #lastFrom()}.<a name="line.91"></a>
+<FONT color="green">092</FONT>         */<a name="line.92"></a>
+<FONT color="green">093</FONT>        public boolean findUnlessHitEnd(int minFrom, int maxFrom);<a name="line.93"></a>
+<FONT color="green">094</FONT>    <a name="line.94"></a>
+<FONT color="green">095</FONT>        /**<a name="line.95"></a>
+<FONT color="green">096</FONT>         * @see Matcher#hitEnd()<a name="line.96"></a>
+<FONT color="green">097</FONT>         */<a name="line.97"></a>
+<FONT color="green">098</FONT>        public boolean hitEnd();<a name="line.98"></a>
+<FONT color="green">099</FONT>    <a name="line.99"></a>
+<FONT color="green">100</FONT>        /**<a name="line.100"></a>
+<FONT color="green">101</FONT>         * @see Matcher#requireEnd()<a name="line.101"></a>
+<FONT color="green">102</FONT>         */<a name="line.102"></a>
+<FONT color="green">103</FONT>        public boolean requireEnd();<a name="line.103"></a>
+<FONT color="green">104</FONT>    <a name="line.104"></a>
+<FONT color="green">105</FONT>        /**<a name="line.105"></a>
+<FONT color="green">106</FONT>         * This property is set by calling {@link #findUnlessHitEnd(int, int)} .<a name="line.106"></a>
+<FONT color="green">107</FONT>         * &lt;p&gt;<a name="line.107"></a>
+<FONT color="green">108</FONT>         * ATTENTION! This property returns maxFrom + 1, if<a name="line.108"></a>
+<FONT color="green">109</FONT>         * {@link #findUnlessHitEnd(int, int)} neither has found a match nor has hit<a name="line.109"></a>
+<FONT color="green">110</FONT>         * the end of input as long it looked for matches that started somewhere in<a name="line.110"></a>
+<FONT color="green">111</FONT>         * the interval [minFrom, maxFrom].<a name="line.111"></a>
+<FONT color="green">112</FONT>         * &lt;p&gt;<a name="line.112"></a>
+<FONT color="green">113</FONT>         * ATTENTION! This information is not really helpful when the buffer size is<a name="line.113"></a>
+<FONT color="green">114</FONT>         * equal to maxFrom. In this case you cannot say whether the position of<a name="line.114"></a>
+<FONT color="green">115</FONT>         * lastFrom is the start of a potential match or not.<a name="line.115"></a>
+<FONT color="green">116</FONT>         * <a name="line.116"></a>
+<FONT color="green">117</FONT>         * @return Returns the last position {@link #findUnlessHitEnd(int, int)} has<a name="line.117"></a>
+<FONT color="green">118</FONT>         *         investigated before it returned.<a name="line.118"></a>
+<FONT color="green">119</FONT>         */<a name="line.119"></a>
+<FONT color="green">120</FONT>        public int lastFrom();<a name="line.120"></a>
+<FONT color="green">121</FONT>    }<a name="line.121"></a>
 
 
 

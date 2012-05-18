@@ -1,11 +1,9 @@
 com.googlecode.streamflyer.core
-com.googlecode.streamflyer.experimental.bytestream
 com.googlecode.streamflyer.experimental.range
 com.googlecode.streamflyer.experimental.stateful
 com.googlecode.streamflyer.experimental.stateful.util
 com.googlecode.streamflyer.experimental.xml
 com.googlecode.streamflyer.regex
-com.googlecode.streamflyer.regex.fast
 com.googlecode.streamflyer.thirdparty
 com.googlecode.streamflyer.util
 com.googlecode.streamflyer.util.statistics
