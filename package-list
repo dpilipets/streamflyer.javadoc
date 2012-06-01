@@ -3,8 +3,8 @@ com.googlecode.streamflyer.experimental.range
 com.googlecode.streamflyer.experimental.stateful
 com.googlecode.streamflyer.experimental.stateful.util
 com.googlecode.streamflyer.experimental.xml
+com.googlecode.streamflyer.internal.thirdparty
 com.googlecode.streamflyer.regex
-com.googlecode.streamflyer.thirdparty
 com.googlecode.streamflyer.util
 com.googlecode.streamflyer.util.statistics
 com.googlecode.streamflyer.xml
