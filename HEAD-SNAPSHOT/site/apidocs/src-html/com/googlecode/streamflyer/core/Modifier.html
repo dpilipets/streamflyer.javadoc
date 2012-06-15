@@ -1,0 +1,143 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /**<a name="line.1"></a>
+<FONT color="green">002</FONT>     * Copyright (C) 2011 rwoo@gmx.de<a name="line.2"></a>
+<FONT color="green">003</FONT>     *<a name="line.3"></a>
+<FONT color="green">004</FONT>     * Licensed under the Apache License, Version 2.0 (the "License");<a name="line.4"></a>
+<FONT color="green">005</FONT>     * you may not use this file except in compliance with the License.<a name="line.5"></a>
+<FONT color="green">006</FONT>     * You may obtain a copy of the License at<a name="line.6"></a>
+<FONT color="green">007</FONT>     *<a name="line.7"></a>
+<FONT color="green">008</FONT>     *         http://www.apache.org/licenses/LICENSE-2.0<a name="line.8"></a>
+<FONT color="green">009</FONT>     *<a name="line.9"></a>
+<FONT color="green">010</FONT>     * Unless required by applicable law or agreed to in writing, software<a name="line.10"></a>
+<FONT color="green">011</FONT>     * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.11"></a>
+<FONT color="green">012</FONT>     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.12"></a>
+<FONT color="green">013</FONT>     * See the License for the specific language governing permissions and<a name="line.13"></a>
+<FONT color="green">014</FONT>     * limitations under the License.<a name="line.14"></a>
+<FONT color="green">015</FONT>     */<a name="line.15"></a>
+<FONT color="green">016</FONT>    <a name="line.16"></a>
+<FONT color="green">017</FONT>    package com.googlecode.streamflyer.core;<a name="line.17"></a>
+<FONT color="green">018</FONT>    <a name="line.18"></a>
+<FONT color="green">019</FONT>    <a name="line.19"></a>
+<FONT color="green">020</FONT>    /**<a name="line.20"></a>
+<FONT color="green">021</FONT>     * A modifier replaces, deletes, inserts characters in a character stream. This<a name="line.21"></a>
+<FONT color="green">022</FONT>     * happens in interaction with a &lt;em&gt;stream processor&lt;/em&gt;, i. e. either a<a name="line.22"></a>
+<FONT color="green">023</FONT>     * {@link ModifyingReader} or a {@link ModifyingWriter}. The modifier can be<a name="line.23"></a>
+<FONT color="green">024</FONT>     * considered a callback that is called by the stream processor to make the<a name="line.24"></a>
+<FONT color="green">025</FONT>     * desired modifications. The pivotal part of the interaction between the<a name="line.25"></a>
+<FONT color="green">026</FONT>     * modifier and the stream processor is a character buffer the stream processor<a name="line.26"></a>
+<FONT color="green">027</FONT>     * facilitates. That buffer contains the characters of the underlying character<a name="line.27"></a>
+<FONT color="green">028</FONT>     * stream.<a name="line.28"></a>
+<FONT color="green">029</FONT>     * &lt;p&gt;<a name="line.29"></a>
+<FONT color="green">030</FONT>     * Besides the modifications of the buffer, the modifier manages the capacity<a name="line.30"></a>
+<FONT color="green">031</FONT>     * (size) of the character buffer and {@link AfterModification defines} what the<a name="line.31"></a>
+<FONT color="green">032</FONT>     * stream processor shall do before the stream processor<a name="line.32"></a>
+<FONT color="green">033</FONT>     * {@link Modifier#modify(StringBuilder, int, boolean) calls} the modifier the<a name="line.33"></a>
+<FONT color="green">034</FONT>     * next time.<a name="line.34"></a>
+<FONT color="green">035</FONT>     * &lt;p&gt;<a name="line.35"></a>
+<FONT color="green">036</FONT>     * Implementations of this interface should inform the user about its specific<a name="line.36"></a>
+<FONT color="green">037</FONT>     * memory consumption because the most important feature of modifiers should be<a name="line.37"></a>
+<FONT color="green">038</FONT>     * their small memory foot-print.<a name="line.38"></a>
+<FONT color="green">039</FONT>     * <a name="line.39"></a>
+<FONT color="green">040</FONT>     * @author rwoo<a name="line.40"></a>
+<FONT color="green">041</FONT>     * @since 06.05.2011<a name="line.41"></a>
+<FONT color="green">042</FONT>     */<a name="line.42"></a>
+<FONT color="green">043</FONT>    public interface Modifier {<a name="line.43"></a>
+<FONT color="green">044</FONT>    <a name="line.44"></a>
+<FONT color="green">045</FONT>        /**<a name="line.45"></a>
+<FONT color="green">046</FONT>         * Processes the characters in the given character buffer, i.e. deletes or<a name="line.46"></a>
+<FONT color="green">047</FONT>         * replaces or inserts characters, or keeps the characters as they are.<a name="line.47"></a>
+<FONT color="green">048</FONT>         * <a name="line.48"></a>
+<FONT color="green">049</FONT>         * @param characterBuffer The next characters provided from the modifiable<a name="line.49"></a>
+<FONT color="green">050</FONT>         *        stream. It contains the modifiable characters, (optionally)<a name="line.50"></a>
+<FONT color="green">051</FONT>         *        preceded by unmodifiable characters.<a name="line.51"></a>
+<FONT color="green">052</FONT>         *        &lt;p&gt;<a name="line.52"></a>
+<FONT color="green">053</FONT>         *        The modifier can modify the content of the buffer as appropriate<a name="line.53"></a>
+<FONT color="green">054</FONT>         *        the modifier must not modify the unmodifiable characters, i.e. the<a name="line.54"></a>
+<FONT color="green">055</FONT>         *        characters before position<a name="line.55"></a>
+<FONT color="green">056</FONT>         *        &lt;code&gt;firstModifiableCharacterInBufferIndex&lt;/code&gt; must not be<a name="line.56"></a>
+<FONT color="green">057</FONT>         *        modified.<a name="line.57"></a>
+<FONT color="green">058</FONT>         *        &lt;p&gt;<a name="line.58"></a>
+<FONT color="green">059</FONT>         *        Your modifier should manage the {@link StringBuilder#capacity()<a name="line.59"></a>
+<FONT color="green">060</FONT>         *        capacity} of the buffer on its own - as the optimal management of<a name="line.60"></a>
+<FONT color="green">061</FONT>         *        the capacity depends on the specific purpose of the modifier.<a name="line.61"></a>
+<FONT color="green">062</FONT>         *        &lt;p&gt;<a name="line.62"></a>
+<FONT color="green">063</FONT>         *        The given buffer must be never null.<a name="line.63"></a>
+<FONT color="green">064</FONT>         * @param firstModifiableCharacterInBuffer index of the first modifiable<a name="line.64"></a>
+<FONT color="green">065</FONT>         *        character in the buffer. The index of the first character in the<a name="line.65"></a>
+<FONT color="green">066</FONT>         *        buffer is zero. If there is not modifiable character in the<a name="line.66"></a>
+<FONT color="green">067</FONT>         *        buffer, then this value is equal the length of the buffer.<a name="line.67"></a>
+<FONT color="green">068</FONT>         * @param endOfStreamHit True if no more characters can be read from the<a name="line.68"></a>
+<FONT color="green">069</FONT>         *        stream, i.e. the character buffer contains the all the characters<a name="line.69"></a>
+<FONT color="green">070</FONT>         *        up to the end of the stream.<a name="line.70"></a>
+<FONT color="green">071</FONT>         * @return Returns an object that defines how {@link ModifyingReader} or<a name="line.71"></a>
+<FONT color="green">072</FONT>         *         {@link ModifyingWriter} shall behave before calling<a name="line.72"></a>
+<FONT color="green">073</FONT>         *         {@link Modifier#modify(StringBuilder, int, boolean)} again.<a name="line.73"></a>
+<FONT color="green">074</FONT>         */<a name="line.74"></a>
+<FONT color="green">075</FONT>        public AfterModification modify(StringBuilder characterBuffer,<a name="line.75"></a>
+<FONT color="green">076</FONT>                int firstModifiableCharacterInBuffer, boolean endOfStreamHit);<a name="line.76"></a>
+<FONT color="green">077</FONT>    }<a name="line.77"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>
