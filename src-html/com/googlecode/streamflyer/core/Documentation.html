@@ -31,153 +31,122 @@
 <span class="sourceLineNo">023</span><a name="line.23"></a>
 <span class="sourceLineNo">024</span>import com.googlecode.streamflyer.regex.MatchProcessor;<a name="line.24"></a>
 <span class="sourceLineNo">025</span>import com.googlecode.streamflyer.regex.RegexModifier;<a name="line.25"></a>
-<span class="sourceLineNo">026</span>import com.googlecode.streamflyer.util.ModifyingReaderFactory;<a name="line.26"></a>
-<span class="sourceLineNo">027</span>import com.googlecode.streamflyer.util.ModifyingWriterFactory;<a name="line.27"></a>
-<span class="sourceLineNo">028</span>import com.googlecode.streamflyer.xml.InvalidXmlCharacterModifier;<a name="line.28"></a>
-<span class="sourceLineNo">029</span>import com.googlecode.streamflyer.xml.XmlVersionModifier;<a name="line.29"></a>
-<span class="sourceLineNo">030</span><a name="line.30"></a>
-<span class="sourceLineNo">031</span>/**<a name="line.31"></a>
-<span class="sourceLineNo">032</span> * Read this first, before you use Streamflyer. This Javadoc content is also<a name="line.32"></a>
-<span class="sourceLineNo">033</span> * available on the &lt;a<a name="line.33"></a>
+<span class="sourceLineNo">026</span>import com.googlecode.streamflyer.regex.addons.stateful.StateMachine;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import com.googlecode.streamflyer.util.ModifyingReaderFactory;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import com.googlecode.streamflyer.util.ModifyingWriterFactory;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import com.googlecode.streamflyer.xml.InvalidXmlCharacterModifier;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>import com.googlecode.streamflyer.xml.XmlVersionModifier;<a name="line.30"></a>
+<span class="sourceLineNo">031</span><a name="line.31"></a>
+<span class="sourceLineNo">032</span>/**<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * Read this first, before you use Streamflyer. This Javadoc content is also available on the &lt;a<a name="line.33"></a>
 <span class="sourceLineNo">034</span> * href="http://code.google.com/p/streamflyer/"&gt;Streamflyer&lt;/a&gt; web page.<a name="line.34"></a>
 <span class="sourceLineNo">035</span> * &lt;p&gt;<a name="line.35"></a>
 <span class="sourceLineNo">036</span> * &lt;h1&gt;Contents&lt;/h1&gt;<a name="line.36"></a>
 <span class="sourceLineNo">037</span> * &lt;p&gt;<a name="line.37"></a>
 <span class="sourceLineNo">038</span> * &lt;b&gt; &lt;a href="#g1"&gt;1. When shall I use this library?&lt;/a&gt;&lt;br/&gt;<a name="line.38"></a>
 <span class="sourceLineNo">039</span> * &lt;a href="#g3"&gt;2. How do I modify character streams?&lt;/a&gt;&lt;br/&gt;<a name="line.39"></a>
-<span class="sourceLineNo">040</span> * &lt;a href="#g4"&gt;3. Which type of modifications are provided out-of-the-box?&lt;/a&gt;<a name="line.40"></a>
-<span class="sourceLineNo">041</span> * &lt;br/&gt;<a name="line.41"></a>
-<span class="sourceLineNo">042</span> * &lt;a href="#g5"&gt;4. What is the benefit of this library in comparison to sed or<a name="line.42"></a>
-<span class="sourceLineNo">043</span> * Perl?&lt;/a&gt;&lt;br/&gt;<a name="line.43"></a>
-<span class="sourceLineNo">044</span> * &lt;a href="#g7"&gt;5. Can I use regular expressions to modify streams?&lt;/a&gt;&lt;br/&gt;<a name="line.44"></a>
-<span class="sourceLineNo">045</span> * &lt;a href="#g8"&gt;6. How much memory does a modifying reader or writer<a name="line.45"></a>
-<span class="sourceLineNo">046</span> * consume?&lt;/a&gt;&lt;br/&gt;<a name="line.46"></a>
-<span class="sourceLineNo">047</span> * &lt;a href="#g9"&gt;7. How big is the performance overhead of a modifying reader or<a name="line.47"></a>
-<span class="sourceLineNo">048</span> * modfying writer?&lt;/a&gt;&lt;br/&gt;<a name="line.48"></a>
-<span class="sourceLineNo">049</span> * &lt;a href="#g10"&gt;8. How do I process regex patterns found in the character<a name="line.49"></a>
-<span class="sourceLineNo">050</span> * stream a more specific way?&lt;/a&gt;&lt;br/&gt;<a name="line.50"></a>
-<span class="sourceLineNo">051</span> * &lt;a href="#g11"&gt;9. Is there a way to modify byte streams instead of character<a name="line.51"></a>
-<span class="sourceLineNo">052</span> * streams, i.e. is there something like a modifying input stream or output<a name="line.52"></a>
-<span class="sourceLineNo">053</span> * stream?&lt;/a&gt;&lt;br/&gt;<a name="line.53"></a>
-<span class="sourceLineNo">054</span> * &lt;/b&gt; &lt;!-- ++++++++++++++++++++++++++++++ --&gt;<a name="line.54"></a>
-<span class="sourceLineNo">055</span> * &lt;h3 id="g1"&gt;1. When shall I use this library?&lt;/h3&gt;<a name="line.55"></a>
+<span class="sourceLineNo">040</span> * &lt;a href="#g4"&gt;3. Which type of modifications are provided out-of-the-box?&lt;/a&gt; &lt;br/&gt;<a name="line.40"></a>
+<span class="sourceLineNo">041</span> * &lt;a href="#g5"&gt;4. What is the benefit of this library in comparison to sed or Perl?&lt;/a&gt;&lt;br/&gt;<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * &lt;a href="#g7"&gt;5. Can I use regular expressions to modify streams?&lt;/a&gt;&lt;br/&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span> * &lt;a href="#g8"&gt;6. How much memory does a modifying reader or writer consume?&lt;/a&gt;&lt;br/&gt;<a name="line.43"></a>
+<span class="sourceLineNo">044</span> * &lt;a href="#g9"&gt;7. How big is the performance overhead of a modifying reader or modfying writer?&lt;/a&gt;&lt;br/&gt;<a name="line.44"></a>
+<span class="sourceLineNo">045</span> * &lt;a href="#g10"&gt;8. How do I process regex patterns found in the character stream a more specific way?&lt;/a&gt;&lt;br/&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> * &lt;a href="#g11"&gt;9. Is there a way to modify byte streams instead of character streams, i.e. is there something like a<a name="line.46"></a>
+<span class="sourceLineNo">047</span> * modifying input stream or output stream?&lt;/a&gt;&lt;br/&gt;<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * &lt;/b&gt; &lt;!-- ++++++++++++++++++++++++++++++ --&gt;<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * &lt;h3 id="g1"&gt;1. When shall I use this library?&lt;/h3&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * &lt;p&gt;<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * This library provides filter that modify character streams on-the-fly with a small memory foot-print using the Java<a name="line.51"></a>
+<span class="sourceLineNo">052</span> * interfaces {@link Reader} and {@link Writer}. Additionally, you can use these filters to report some patterns found<a name="line.52"></a>
+<span class="sourceLineNo">053</span> * in character streams without modifying the content of the character streams.<a name="line.53"></a>
+<span class="sourceLineNo">054</span> * &lt;p&gt;<a name="line.54"></a>
+<span class="sourceLineNo">055</span> * Use this library only if you use Java 6 or higher.<a name="line.55"></a>
 <span class="sourceLineNo">056</span> * &lt;p&gt;<a name="line.56"></a>
-<span class="sourceLineNo">057</span> * This library provides filter that modify character streams on-the-fly with a<a name="line.57"></a>
-<span class="sourceLineNo">058</span> * small memory foot-print using the Java interfaces {@link Reader} and<a name="line.58"></a>
-<span class="sourceLineNo">059</span> * {@link Writer}. Additionally, you can use these filters to report some<a name="line.59"></a>
-<span class="sourceLineNo">060</span> * patterns found in character streams without modifying the content of the<a name="line.60"></a>
-<span class="sourceLineNo">061</span> * character streams.<a name="line.61"></a>
+<span class="sourceLineNo">057</span> * If you want to optimize the speed of the stream modifications and you don't care of memory consumption (assuming you<a name="line.57"></a>
+<span class="sourceLineNo">058</span> * are in the cloud), then load the entire content of the stream into the memory and modify the stream content there. In<a name="line.58"></a>
+<span class="sourceLineNo">059</span> * this case this library is not the right choice for you because this library minimizes the use of memory at the<a name="line.59"></a>
+<span class="sourceLineNo">060</span> * expense of a reduced speed of the stream modifications.<a name="line.60"></a>
+<span class="sourceLineNo">061</span> * &lt;h3 id="g3"&gt;2. How do I modify character streams?&lt;/h3&gt;<a name="line.61"></a>
 <span class="sourceLineNo">062</span> * &lt;p&gt;<a name="line.62"></a>
-<span class="sourceLineNo">063</span> * Use this library only if you use Java 6 or higher.<a name="line.63"></a>
-<span class="sourceLineNo">064</span> * &lt;p&gt;<a name="line.64"></a>
-<span class="sourceLineNo">065</span> * If you want to optimize the speed of the stream modifications and you don't<a name="line.65"></a>
-<span class="sourceLineNo">066</span> * care of memory consumption (assuming you are in the cloud), then load the<a name="line.66"></a>
-<span class="sourceLineNo">067</span> * entire content of the stream into the memory and modify the stream content<a name="line.67"></a>
-<span class="sourceLineNo">068</span> * there. In this case this library is not the right choice for you because this<a name="line.68"></a>
-<span class="sourceLineNo">069</span> * library minimizes the use of memory at the expense of a reduced speed of the<a name="line.69"></a>
-<span class="sourceLineNo">070</span> * stream modifications.<a name="line.70"></a>
-<span class="sourceLineNo">071</span> * &lt;h3 id="g3"&gt;2. How do I modify character streams?&lt;/h3&gt;<a name="line.71"></a>
-<span class="sourceLineNo">072</span> * &lt;p&gt;<a name="line.72"></a>
-<span class="sourceLineNo">073</span> * First you have to implement a callback that makes the desired modifications<a name="line.73"></a>
-<span class="sourceLineNo">074</span> * on a small part of the entire character stream. The contract of that callback<a name="line.74"></a>
-<span class="sourceLineNo">075</span> * is defined by {@link Modifier}. For some common use cases pre-defined<a name="line.75"></a>
-<span class="sourceLineNo">076</span> * modifiers exist.<a name="line.76"></a>
-<span class="sourceLineNo">077</span> * &lt;p&gt;<a name="line.77"></a>
-<span class="sourceLineNo">078</span> * Second, wrap the original reader or writer with a modifying reader or writer.<a name="line.78"></a>
-<span class="sourceLineNo">079</span> * &lt;p&gt;<a name="line.79"></a>
-<span class="sourceLineNo">080</span> * Example for a modifying reader that removes invalid characters from XML<a name="line.80"></a>
-<span class="sourceLineNo">081</span> * files:<a name="line.81"></a>
-<span class="sourceLineNo">082</span> * &lt;code&gt;&lt;pre class="prettyprint lang-java"&gt;// choose the character stream to modify<a name="line.82"></a>
-<span class="sourceLineNo">083</span>Reader originalReader = ... // this reader is connected to the original data source<a name="line.83"></a>
-<span class="sourceLineNo">084</span><a name="line.84"></a>
-<span class="sourceLineNo">085</span>// select the modifier<a name="line.85"></a>
-<span class="sourceLineNo">086</span>Modifier myModifier = new InvalidXmlCharacterModifier(1024, "", "1.0", false);<a name="line.86"></a>
-<span class="sourceLineNo">087</span><a name="line.87"></a>
-<span class="sourceLineNo">088</span>// create the modifying reader that wraps the original reader<a name="line.88"></a>
-<span class="sourceLineNo">089</span>Reader modifyingReader = new ModifyingReader(originalReader, myModifier);<a name="line.89"></a>
-<span class="sourceLineNo">090</span><a name="line.90"></a>
-<span class="sourceLineNo">091</span>... // use the modifying reader instead of the original reader&lt;/pre&gt;&lt;/code&gt;<a name="line.91"></a>
-<span class="sourceLineNo">092</span> * &lt;h3 id="g4"&gt;3. Which modifiers are provided out-of-the-box?&lt;/h3&gt;<a name="line.92"></a>
-<span class="sourceLineNo">093</span> * &lt;p&gt;<a name="line.93"></a>
-<span class="sourceLineNo">094</span> * The following modifications are provided out-of-the-box.<a name="line.94"></a>
-<span class="sourceLineNo">095</span> * &lt;ul&gt;<a name="line.95"></a>
-<span class="sourceLineNo">096</span> * &lt;li&gt;{@link RegexModifier}: Replaces characters using regular expressions.<a name="line.96"></a>
-<span class="sourceLineNo">097</span> * &lt;li&gt;{@link XmlVersionModifier}: Changes the version in the prolog of XML<a name="line.97"></a>
-<span class="sourceLineNo">098</span> * files.<a name="line.98"></a>
-<span class="sourceLineNo">099</span> * &lt;li&gt;{@link InvalidXmlCharacterModifier}: Replaces invalid XML characters in<a name="line.99"></a>
-<span class="sourceLineNo">100</span> * XML files or removes them from XML files.<a name="line.100"></a>
-<span class="sourceLineNo">101</span> * &lt;li&gt;<a name="line.101"></a>
-<span class="sourceLineNo">102</span> * {@link com.googlecode.streamflyer.experimental.range.RangeFilterModifier<a name="line.102"></a>
-<span class="sourceLineNo">103</span> * RangeFilterModifier} (experimental module): Removes everything from the<a name="line.103"></a>
-<span class="sourceLineNo">104</span> * stream apart from the content between a start tag and an end tag.<a name="line.104"></a>
-<span class="sourceLineNo">105</span> * &lt;/ul&gt;<a name="line.105"></a>
-<span class="sourceLineNo">106</span> * The factories {@link ModifyingReaderFactory} and<a name="line.106"></a>
-<span class="sourceLineNo">107</span> * {@link ModifyingWriterFactory} ease the use of these modifiers.<a name="line.107"></a>
-<span class="sourceLineNo">108</span> * &lt;p&gt;<a name="line.108"></a>
-<span class="sourceLineNo">109</span> * Do you know another common use case that should be supported by this library?<a name="line.109"></a>
-<span class="sourceLineNo">110</span> * Then, please let the author know. A corresponding modifier might be added to<a name="line.110"></a>
-<span class="sourceLineNo">111</span> * the library in a future version.<a name="line.111"></a>
-<span class="sourceLineNo">112</span> * &lt;h3 id="g5"&gt;4. What is the benefit of this library in comparison to sed or<a name="line.112"></a>
-<span class="sourceLineNo">113</span> * awk or Perl?&lt;/h3&gt;<a name="line.113"></a>
-<span class="sourceLineNo">114</span> * &lt;p&gt;<a name="line.114"></a>
-<span class="sourceLineNo">115</span> * The line-based approach of &lt;em&gt;sed&lt;/em&gt; consumes a lot of memory if you<a name="line.115"></a>
-<span class="sourceLineNo">116</span> * modify a large XML file that does contain no or only a few line breaks. The<a name="line.116"></a>
-<span class="sourceLineNo">117</span> * modifications &lt;em&gt;sed&lt;/em&gt; can carry out are limited to replacements using<a name="line.117"></a>
-<span class="sourceLineNo">118</span> * regular expressions. This library instead supports any kind of modification<a name="line.118"></a>
-<span class="sourceLineNo">119</span> * and consumes not much memory how big the processed file may be. In comparison<a name="line.119"></a>
-<span class="sourceLineNo">120</span> * to &lt;em&gt;awk&lt;/em&gt; and &lt;em&gt;perl&lt;/em&gt;, this library seamlessly integrates with<a name="line.120"></a>
-<span class="sourceLineNo">121</span> * Java software that uses the interfaces for character streams ({@link Reader}<a name="line.121"></a>
-<span class="sourceLineNo">122</span> * and {@link Writer}).<a name="line.122"></a>
-<span class="sourceLineNo">123</span> * &lt;h3 id="g7"&gt;5. Can I use regular expressions to modify streams?&lt;/h3&gt;<a name="line.123"></a>
-<span class="sourceLineNo">124</span> * &lt;p&gt;<a name="line.124"></a>
-<span class="sourceLineNo">125</span> * Yes. Use the {@link RegexModifier} directly or, more convenient, use the<a name="line.125"></a>
-<span class="sourceLineNo">126</span> * {@link ModifyingReaderFactory} or the {@link ModifyingWriterFactory}.<a name="line.126"></a>
-<span class="sourceLineNo">127</span> * &lt;h3 id="g8"&gt;6. How much memory does a modifying reader or writer consume?&lt;/h3&gt;<a name="line.127"></a>
-<span class="sourceLineNo">128</span> * &lt;p&gt;<a name="line.128"></a>
-<span class="sourceLineNo">129</span> * This depends entirely on the used {@link Modifier} and the task the modifier<a name="line.129"></a>
-<span class="sourceLineNo">130</span> * has to fulfill. Basically the modifier defines the number of characters to<a name="line.130"></a>
-<span class="sourceLineNo">131</span> * process at once by {@link AfterModification#getNewNumberOfChars()}. This is<a name="line.131"></a>
-<span class="sourceLineNo">132</span> * the minimum of characters in the memory. The API documentation of each<a name="line.132"></a>
-<span class="sourceLineNo">133</span> * modifier implementation should make clear how much memory the modifier<a name="line.133"></a>
-<span class="sourceLineNo">134</span> * consumes at most. Double that number (the maximum number of characters to be<a name="line.134"></a>
-<span class="sourceLineNo">135</span> * processed at once), then you got the maximum capacity of the used character<a name="line.135"></a>
-<span class="sourceLineNo">136</span> * buffer, i.e. the number of characters in the memory. Hint: The number must be<a name="line.136"></a>
-<span class="sourceLineNo">137</span> * doubled due to the internal implementation of Java's<a name="line.137"></a>
-<span class="sourceLineNo">138</span> * {@link StringBuilder#ensureCapacity(int)}.<a name="line.138"></a>
-<span class="sourceLineNo">139</span> * &lt;h3 id="g9"&gt;7. How big is the performance overhead of a modifying reader or<a name="line.139"></a>
-<span class="sourceLineNo">140</span> * modifying writer that does nothing (no modification, no logging etc.) in<a name="line.140"></a>
-<span class="sourceLineNo">141</span> * comparison to the use of a reader or writer that reads its data directly from<a name="line.141"></a>
-<span class="sourceLineNo">142</span> * memory?&lt;/h3&gt;<a name="line.142"></a>
-<span class="sourceLineNo">143</span> * &lt;p&gt;<a name="line.143"></a>
-<span class="sourceLineNo">144</span> * If you use such an idle modifier to process 10 million characters using a<a name="line.144"></a>
-<span class="sourceLineNo">145</span> * buffer of 500 characters, then the overhead is 0.2 seconds using a modifying<a name="line.145"></a>
-<span class="sourceLineNo">146</span> * reader and 0.4 seconds using a modifying writer (normal PC, 2011).<a name="line.146"></a>
-<span class="sourceLineNo">147</span> * &lt;p&gt;<a name="line.147"></a>
-<span class="sourceLineNo">148</span> * &lt;h3 id="g10"&gt;8. How do I process regex patterns found in the character<a name="line.148"></a>
-<span class="sourceLineNo">149</span> * stream?&lt;/h3&gt;<a name="line.149"></a>
-<span class="sourceLineNo">150</span> * &lt;p&gt;<a name="line.150"></a>
-<span class="sourceLineNo">151</span> * By default {@link RegexModifier} will replace the matches with the given<a name="line.151"></a>
-<span class="sourceLineNo">152</span> * replacement. If you want to do more or something else (logging, arbitrary<a name="line.152"></a>
-<span class="sourceLineNo">153</span> * insertions), then implement your own {@link MatchProcessor}, and use it with<a name="line.153"></a>
-<span class="sourceLineNo">154</span> * the {@link RegexModifier}.<a name="line.154"></a>
-<span class="sourceLineNo">155</span> * &lt;p&gt;<a name="line.155"></a>
-<span class="sourceLineNo">156</span> * &lt;h3 id="g11"&gt;9. Is there a way to modify byte streams instead of character<a name="line.156"></a>
-<span class="sourceLineNo">157</span> * streams, i.e. is there something like a modifying input stream or output<a name="line.157"></a>
-<span class="sourceLineNo">158</span> * stream?&lt;/h3&gt;<a name="line.158"></a>
-<span class="sourceLineNo">159</span> * &lt;p&gt;<a name="line.159"></a>
-<span class="sourceLineNo">160</span> * No, at the moment there is no special code for byte streams. An approach<a name="line.160"></a>
-<span class="sourceLineNo">161</span> * could be to define your own {@link CharsetDecoder} and {@link CharsetEncoder}<a name="line.161"></a>
-<span class="sourceLineNo">162</span> * , then convert the byte stream to a pseudo character stream, modify the<a name="line.162"></a>
-<span class="sourceLineNo">163</span> * character stream, and then convert the pseudo characters back to bytes. Is<a name="line.163"></a>
-<span class="sourceLineNo">164</span> * the performance of this approach still sufficient despite the two<a name="line.164"></a>
-<span class="sourceLineNo">165</span> * conversions? Let me know if you tried this.<a name="line.165"></a>
-<span class="sourceLineNo">166</span> * <a name="line.166"></a>
-<span class="sourceLineNo">167</span> * @author rwoo<a name="line.167"></a>
-<span class="sourceLineNo">168</span> * @since 13.09.2011<a name="line.168"></a>
-<span class="sourceLineNo">169</span> */<a name="line.169"></a>
-<span class="sourceLineNo">170</span>public class Documentation {<a name="line.170"></a>
-<span class="sourceLineNo">171</span>    // nothing to do here<a name="line.171"></a>
-<span class="sourceLineNo">172</span>}<a name="line.172"></a>
+<span class="sourceLineNo">063</span> * First you have to implement a callback that makes the desired modifications on a small part of the entire character<a name="line.63"></a>
+<span class="sourceLineNo">064</span> * stream. The contract of that callback is defined by {@link Modifier}. For some common use cases pre-defined modifiers<a name="line.64"></a>
+<span class="sourceLineNo">065</span> * exist.<a name="line.65"></a>
+<span class="sourceLineNo">066</span> * &lt;p&gt;<a name="line.66"></a>
+<span class="sourceLineNo">067</span> * Second, wrap the original reader or writer with a modifying reader or writer.<a name="line.67"></a>
+<span class="sourceLineNo">068</span> * &lt;p&gt;<a name="line.68"></a>
+<span class="sourceLineNo">069</span> * Example for a modifying reader that removes invalid characters from XML files:<a name="line.69"></a>
+<span class="sourceLineNo">070</span> * &lt;code&gt;&lt;pre class="prettyprint lang-java"&gt;// choose the character stream to modify<a name="line.70"></a>
+<span class="sourceLineNo">071</span>Reader originalReader = ... // this reader is connected to the original data source<a name="line.71"></a>
+<span class="sourceLineNo">072</span><a name="line.72"></a>
+<span class="sourceLineNo">073</span>// select the modifier<a name="line.73"></a>
+<span class="sourceLineNo">074</span>Modifier myModifier = new InvalidXmlCharacterModifier(1024, "", "1.0", false);<a name="line.74"></a>
+<span class="sourceLineNo">075</span><a name="line.75"></a>
+<span class="sourceLineNo">076</span>// create the modifying reader that wraps the original reader<a name="line.76"></a>
+<span class="sourceLineNo">077</span>Reader modifyingReader = new ModifyingReader(originalReader, myModifier);<a name="line.77"></a>
+<span class="sourceLineNo">078</span><a name="line.78"></a>
+<span class="sourceLineNo">079</span>... // use the modifying reader instead of the original reader&lt;/pre&gt;&lt;/code&gt;<a name="line.79"></a>
+<span class="sourceLineNo">080</span> * &lt;h3 id="g4"&gt;3. Which modifiers are provided out-of-the-box?&lt;/h3&gt;<a name="line.80"></a>
+<span class="sourceLineNo">081</span> * &lt;p&gt;<a name="line.81"></a>
+<span class="sourceLineNo">082</span> * The following modifications are provided out-of-the-box.<a name="line.82"></a>
+<span class="sourceLineNo">083</span> * &lt;ul&gt;<a name="line.83"></a>
+<span class="sourceLineNo">084</span> * &lt;li&gt;{@link RegexModifier}: Replaces characters using regular expressions. Some add-ons provide more functionality.<a name="line.84"></a>
+<span class="sourceLineNo">085</span> * &lt;li&gt;{@link XmlVersionModifier}: Changes the version in the prolog of XML files.<a name="line.85"></a>
+<span class="sourceLineNo">086</span> * &lt;li&gt;{@link InvalidXmlCharacterModifier}: Replaces invalid XML characters in XML files or removes them from XML files.<a name="line.86"></a>
+<span class="sourceLineNo">087</span> * &lt;li&gt;<a name="line.87"></a>
+<span class="sourceLineNo">088</span> * {@link com.googlecode.streamflyer.experimental.range.RangeFilterModifier RangeFilterModifier} (experimental module):<a name="line.88"></a>
+<span class="sourceLineNo">089</span> * Removes everything from the stream apart from the content between a start tag and an end tag.<a name="line.89"></a>
+<span class="sourceLineNo">090</span> * &lt;/ul&gt;<a name="line.90"></a>
+<span class="sourceLineNo">091</span> * The factories {@link ModifyingReaderFactory} and {@link ModifyingWriterFactory} ease the use of these modifiers.<a name="line.91"></a>
+<span class="sourceLineNo">092</span> * &lt;p&gt;<a name="line.92"></a>
+<span class="sourceLineNo">093</span> * Do you know another common use case that should be supported by this library? Then, please let the author know. A<a name="line.93"></a>
+<span class="sourceLineNo">094</span> * corresponding modifier might be added to the library in a future version.<a name="line.94"></a>
+<span class="sourceLineNo">095</span> * &lt;h3 id="g5"&gt;4. What is the benefit of this library in comparison to sed or awk or Perl?&lt;/h3&gt;<a name="line.95"></a>
+<span class="sourceLineNo">096</span> * &lt;p&gt;<a name="line.96"></a>
+<span class="sourceLineNo">097</span> * The line-based approach of &lt;em&gt;sed&lt;/em&gt; consumes a lot of memory if you modify a large XML file that does contain no<a name="line.97"></a>
+<span class="sourceLineNo">098</span> * or only a few line breaks. The modifications &lt;em&gt;sed&lt;/em&gt; can carry out are limited to replacements using regular<a name="line.98"></a>
+<span class="sourceLineNo">099</span> * expressions. This library instead supports any kind of modification and consumes not much memory how big the<a name="line.99"></a>
+<span class="sourceLineNo">100</span> * processed file may be. In comparison to &lt;em&gt;awk&lt;/em&gt; and &lt;em&gt;perl&lt;/em&gt;, this library seamlessly integrates with Java<a name="line.100"></a>
+<span class="sourceLineNo">101</span> * software that uses the interfaces for character streams ({@link Reader} and {@link Writer}).<a name="line.101"></a>
+<span class="sourceLineNo">102</span> * &lt;h3 id="g7"&gt;5. Can I use regular expressions to modify streams?&lt;/h3&gt;<a name="line.102"></a>
+<span class="sourceLineNo">103</span> * &lt;p&gt;<a name="line.103"></a>
+<span class="sourceLineNo">104</span> * Yes. Use the {@link RegexModifier} directly or, more convenient, use the {@link ModifyingReaderFactory} or the<a name="line.104"></a>
+<span class="sourceLineNo">105</span> * {@link ModifyingWriterFactory}.<a name="line.105"></a>
+<span class="sourceLineNo">106</span> * &lt;h3 id="g8"&gt;6. How much memory does a modifying reader or writer consume?&lt;/h3&gt;<a name="line.106"></a>
+<span class="sourceLineNo">107</span> * &lt;p&gt;<a name="line.107"></a>
+<span class="sourceLineNo">108</span> * This depends entirely on the used {@link Modifier} and the task the modifier has to fulfill. Basically the modifier<a name="line.108"></a>
+<span class="sourceLineNo">109</span> * defines the number of characters to process at once by {@link AfterModification#getNewNumberOfChars()}. This is the<a name="line.109"></a>
+<span class="sourceLineNo">110</span> * minimum of characters in the memory. The API documentation of each modifier implementation should make clear how much<a name="line.110"></a>
+<span class="sourceLineNo">111</span> * memory the modifier consumes at most. Double that number (the maximum number of characters to be processed at once),<a name="line.111"></a>
+<span class="sourceLineNo">112</span> * then you got the maximum capacity of the used character buffer, i.e. the number of characters in the memory. Hint:<a name="line.112"></a>
+<span class="sourceLineNo">113</span> * The number must be doubled due to the internal implementation of Java's {@link StringBuilder#ensureCapacity(int)}.<a name="line.113"></a>
+<span class="sourceLineNo">114</span> * &lt;h3 id="g9"&gt;7. How big is the performance overhead of a modifying reader or modifying writer that does nothing (no<a name="line.114"></a>
+<span class="sourceLineNo">115</span> * modification, no logging etc.) in comparison to the use of a reader or writer that reads its data directly from<a name="line.115"></a>
+<span class="sourceLineNo">116</span> * memory?&lt;/h3&gt;<a name="line.116"></a>
+<span class="sourceLineNo">117</span> * &lt;p&gt;<a name="line.117"></a>
+<span class="sourceLineNo">118</span> * If you use such an idle modifier to process 10 million characters using a buffer of 500 characters, then the overhead<a name="line.118"></a>
+<span class="sourceLineNo">119</span> * is 0.2 seconds using a modifying reader and 0.4 seconds using a modifying writer (normal PC, 2011).<a name="line.119"></a>
+<span class="sourceLineNo">120</span> * &lt;p&gt;<a name="line.120"></a>
+<span class="sourceLineNo">121</span> * &lt;h3 id="g10"&gt;8. How do I process regex patterns found in the character stream?&lt;/h3&gt;<a name="line.121"></a>
+<span class="sourceLineNo">122</span> * &lt;p&gt;<a name="line.122"></a>
+<span class="sourceLineNo">123</span> * By default {@link RegexModifier} will replace the matches with the given replacement. If you want to do more or<a name="line.123"></a>
+<span class="sourceLineNo">124</span> * something else (logging, arbitrary insertions), then implement your own {@link MatchProcessor}, and use it with the<a name="line.124"></a>
+<span class="sourceLineNo">125</span> * {@link RegexModifier}. There are already some add-ons like {@link StateMachine} which ease the customization of<a name="line.125"></a>
+<span class="sourceLineNo">126</span> * modifiers. Have a look at the project page for more information about customization of modifiers.<a name="line.126"></a>
+<span class="sourceLineNo">127</span> * &lt;p&gt;<a name="line.127"></a>
+<span class="sourceLineNo">128</span> * &lt;h3 id="g11"&gt;9. Is there a way to modify byte streams instead of character streams, i.e. is there something like a<a name="line.128"></a>
+<span class="sourceLineNo">129</span> * modifying input stream or output stream?&lt;/h3&gt;<a name="line.129"></a>
+<span class="sourceLineNo">130</span> * &lt;p&gt;<a name="line.130"></a>
+<span class="sourceLineNo">131</span> * No, at the moment there is no special code for byte streams. An approach could be to define your own<a name="line.131"></a>
+<span class="sourceLineNo">132</span> * {@link CharsetDecoder} and {@link CharsetEncoder} , then convert the byte stream to a pseudo character stream, modify<a name="line.132"></a>
+<span class="sourceLineNo">133</span> * the character stream, and then convert the pseudo characters back to bytes. Is the performance of this approach still<a name="line.133"></a>
+<span class="sourceLineNo">134</span> * sufficient despite the two conversions? Let me know if you tried this.<a name="line.134"></a>
+<span class="sourceLineNo">135</span> * <a name="line.135"></a>
+<span class="sourceLineNo">136</span> * @author rwoo<a name="line.136"></a>
+<span class="sourceLineNo">137</span> * @since 13.09.2011<a name="line.137"></a>
+<span class="sourceLineNo">138</span> */<a name="line.138"></a>
+<span class="sourceLineNo">139</span>public class Documentation {<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    // nothing to do here<a name="line.140"></a>
+<span class="sourceLineNo">141</span>}<a name="line.141"></a>
 
 
 
