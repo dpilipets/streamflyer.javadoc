@@ -1,10 +1,16 @@
 com.googlecode.streamflyer.core
 com.googlecode.streamflyer.experimental.range
+com.googlecode.streamflyer.experimental.range2
 com.googlecode.streamflyer.experimental.stateful
 com.googlecode.streamflyer.experimental.stateful.util
 com.googlecode.streamflyer.experimental.xml
 com.googlecode.streamflyer.internal.thirdparty
 com.googlecode.streamflyer.regex
+com.googlecode.streamflyer.regex.addons.nomatch
+com.googlecode.streamflyer.regex.addons.saxlike
+com.googlecode.streamflyer.regex.addons.stateful
+com.googlecode.streamflyer.regex.addons.tokens
+com.googlecode.streamflyer.regex.addons.util
 com.googlecode.streamflyer.util
 com.googlecode.streamflyer.util.statistics
 com.googlecode.streamflyer.xml

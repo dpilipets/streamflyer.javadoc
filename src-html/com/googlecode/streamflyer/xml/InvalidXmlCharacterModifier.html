@@ -1,334 +1,339 @@
-<HTML>
-<BODY BGCOLOR="white">
-<PRE>
-<FONT color="green">001</FONT>    /**<a name="line.1"></a>
-<FONT color="green">002</FONT>     * Copyright (C) 2011 rwoo@gmx.de<a name="line.2"></a>
-<FONT color="green">003</FONT>     *<a name="line.3"></a>
-<FONT color="green">004</FONT>     * Licensed under the Apache License, Version 2.0 (the "License");<a name="line.4"></a>
-<FONT color="green">005</FONT>     * you may not use this file except in compliance with the License.<a name="line.5"></a>
-<FONT color="green">006</FONT>     * You may obtain a copy of the License at<a name="line.6"></a>
-<FONT color="green">007</FONT>     *<a name="line.7"></a>
-<FONT color="green">008</FONT>     *         http://www.apache.org/licenses/LICENSE-2.0<a name="line.8"></a>
-<FONT color="green">009</FONT>     *<a name="line.9"></a>
-<FONT color="green">010</FONT>     * Unless required by applicable law or agreed to in writing, software<a name="line.10"></a>
-<FONT color="green">011</FONT>     * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.11"></a>
-<FONT color="green">012</FONT>     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.12"></a>
-<FONT color="green">013</FONT>     * See the License for the specific language governing permissions and<a name="line.13"></a>
-<FONT color="green">014</FONT>     * limitations under the License.<a name="line.14"></a>
-<FONT color="green">015</FONT>     */<a name="line.15"></a>
-<FONT color="green">016</FONT>    <a name="line.16"></a>
-<FONT color="green">017</FONT>    package com.googlecode.streamflyer.xml;<a name="line.17"></a>
-<FONT color="green">018</FONT>    <a name="line.18"></a>
-<FONT color="green">019</FONT>    import java.io.InputStream;<a name="line.19"></a>
-<FONT color="green">020</FONT>    import java.util.regex.Matcher;<a name="line.20"></a>
-<FONT color="green">021</FONT>    import java.util.regex.Pattern;<a name="line.21"></a>
-<FONT color="green">022</FONT>    <a name="line.22"></a>
-<FONT color="green">023</FONT>    import com.googlecode.streamflyer.core.AfterModification;<a name="line.23"></a>
-<FONT color="green">024</FONT>    import com.googlecode.streamflyer.core.Modifier;<a name="line.24"></a>
-<FONT color="green">025</FONT>    import com.googlecode.streamflyer.internal.thirdparty.ZzzValidate;<a name="line.25"></a>
-<FONT color="green">026</FONT>    import com.googlecode.streamflyer.util.ModificationFactory;<a name="line.26"></a>
-<FONT color="green">027</FONT>    import com.googlecode.streamflyer.util.ModifyingReaderFactory;<a name="line.27"></a>
-<FONT color="green">028</FONT>    import com.googlecode.streamflyer.util.statistics.LineColumnAwareModificationFactory;<a name="line.28"></a>
-<FONT color="green">029</FONT>    import com.googlecode.streamflyer.util.statistics.PositionAwareModificationFactory;<a name="line.29"></a>
-<FONT color="green">030</FONT>    <a name="line.30"></a>
-<FONT color="green">031</FONT>    /**<a name="line.31"></a>
-<FONT color="green">032</FONT>     * This modifier replaces invalid XML characters in an stream that contains an<a name="line.32"></a>
-<FONT color="green">033</FONT>     * XML document.<a name="line.33"></a>
-<FONT color="green">034</FONT>     * &lt;p&gt;<a name="line.34"></a>
-<FONT color="green">035</FONT>     * &lt;h1&gt;Contents&lt;/h1&gt;<a name="line.35"></a>
-<FONT color="green">036</FONT>     * &lt;p&gt;<a name="line.36"></a>
-<FONT color="green">037</FONT>     * &lt;b&gt; &lt;a href="#g1"&gt;1. How do I use this modifier?&lt;/a&gt;&lt;br/&gt;<a name="line.37"></a>
-<FONT color="green">038</FONT>     * &lt;a href="#g2"&gt;2. In addition to the replacement of the invalid characters I<a name="line.38"></a>
-<FONT color="green">039</FONT>     * want to record the replacements and sent notifications. How can I do<a name="line.39"></a>
-<FONT color="green">040</FONT>     * this?&lt;/a&gt; &lt;br/&gt;<a name="line.40"></a>
-<FONT color="green">041</FONT>     * &lt;a href="#g3"&gt;3. How can I find out the position of the matches within the<a name="line.41"></a>
-<FONT color="green">042</FONT>     * stream?&lt;/a&gt; &lt;br/&gt;<a name="line.42"></a>
-<FONT color="green">043</FONT>     * &lt;a href="#g4"&gt;4. How do I use this class with an {@link InputStream}?&lt;/a&gt;&lt;br/&gt;<a name="line.43"></a>
-<FONT color="green">044</FONT>     * &lt;a href="#g5"&gt;5. How much memory does the modifier consume?&lt;/a&gt;&lt;br/&gt;<a name="line.44"></a>
-<FONT color="green">045</FONT>     * &lt;a href="#g6"&gt;6. When should I not use this modifier?&lt;/a&gt;&lt;br/&gt;<a name="line.45"></a>
-<FONT color="green">046</FONT>     * &lt;/b&gt; &lt;!-- ++++++++++++++++++++++++++++++ --&gt;<a name="line.46"></a>
-<FONT color="green">047</FONT>     * &lt;p&gt;<a name="line.47"></a>
-<FONT color="green">048</FONT>     * &lt;h3 id="g1"&gt;1. How do I use this modifier?&lt;/h3&gt;<a name="line.48"></a>
-<FONT color="green">049</FONT>     * &lt;p&gt;<a name="line.49"></a>
-<FONT color="green">050</FONT>     * EXAMPLE 1. This example shows how to remove the invalid characters:<a name="line.50"></a>
-<FONT color="green">051</FONT>     * &lt;code&gt;&lt;pre class="prettyprint lang-java"&gt;// choose the character stream to modify<a name="line.51"></a>
-<FONT color="green">052</FONT>    Reader reader = new StringReader("foo\uD8FFbar");<a name="line.52"></a>
-<FONT color="green">053</FONT>    <a name="line.53"></a>
-<FONT color="green">054</FONT>    // define what and how to replace (the empty string as replacement)<a name="line.54"></a>
-<FONT color="green">055</FONT>    Modifier modifier = new InvalidXmlCharacterModifier("",<a name="line.55"></a>
-<FONT color="green">056</FONT>            InvalidXmlCharacterModifier.XML_11_VERSION);<a name="line.56"></a>
-<FONT color="green">057</FONT>    <a name="line.57"></a>
-<FONT color="green">058</FONT>    // create the modifying reader that wraps the original reader<a name="line.58"></a>
-<FONT color="green">059</FONT>    ModifyingReader modifyingReader = new ModifyingReader(reader, modifier);<a name="line.59"></a>
-<FONT color="green">060</FONT>    <a name="line.60"></a>
-<FONT color="green">061</FONT>    // use the modifying reader instead of the original reader<a name="line.61"></a>
-<FONT color="green">062</FONT>    String actualOutput = IOUtils.toString(modifyingReader);<a name="line.62"></a>
-<FONT color="green">063</FONT>    <a name="line.63"></a>
-<FONT color="green">064</FONT>    assertEquals("foobar", actualOutput);&lt;/pre&gt;&lt;/code&gt;<a name="line.64"></a>
-<FONT color="green">065</FONT>     * &lt;p&gt;<a name="line.65"></a>
-<FONT color="green">066</FONT>     * EXAMPLE 2. This example shows how to replace the invalid characters with an<a name="line.66"></a>
-<FONT color="green">067</FONT>     * error message:<a name="line.67"></a>
-<FONT color="green">068</FONT>     * &lt;code&gt;&lt;pre class="prettyprint lang-java"&gt;// choose the character stream to modify<a name="line.68"></a>
-<FONT color="green">069</FONT>    Reader reader = new StringReader("foo\uD8FFbar");<a name="line.69"></a>
-<FONT color="green">070</FONT>    <a name="line.70"></a>
-<FONT color="green">071</FONT>    // define what and how to replace (an error message as replacement)<a name="line.71"></a>
-<FONT color="green">072</FONT>    Modifier modifier = new InvalidXmlCharacterModifier(<a name="line.72"></a>
-<FONT color="green">073</FONT>            "[INVALID XML CHAR FOUND: $0]",<a name="line.73"></a>
-<FONT color="green">074</FONT>            InvalidXmlCharacterModifier.XML_11_VERSION);<a name="line.74"></a>
-<FONT color="green">075</FONT>    <a name="line.75"></a>
-<FONT color="green">076</FONT>    // create the modifying reader that wraps the original reader<a name="line.76"></a>
-<FONT color="green">077</FONT>    ModifyingReader modifyingReader = new ModifyingReader(reader, modifier);<a name="line.77"></a>
-<FONT color="green">078</FONT>    <a name="line.78"></a>
-<FONT color="green">079</FONT>    // use the modifying reader instead of the original reader<a name="line.79"></a>
-<FONT color="green">080</FONT>    String actualOutput = IOUtils.toString(modifyingReader);<a name="line.80"></a>
-<FONT color="green">081</FONT>    <a name="line.81"></a>
-<FONT color="green">082</FONT>    assertEquals("foo[INVALID XML CHAR FOUND: U+D8FF]bar", actualOutput);&lt;/pre&gt;&lt;/code&gt;<a name="line.82"></a>
-<FONT color="green">083</FONT>     * &lt;h3 id="g2"&gt;2. In addition to the replacement of the invalid characters I<a name="line.83"></a>
-<FONT color="green">084</FONT>     * want to record the replacements and sent notifications. How can I do this?&lt;/h3&gt;<a name="line.84"></a>
-<FONT color="green">085</FONT>     * &lt;p&gt;<a name="line.85"></a>
-<FONT color="green">086</FONT>     * Subclass {@link InvalidXmlCharacterModifier} and override<a name="line.86"></a>
-<FONT color="green">087</FONT>     * {@link InvalidXmlCharacterModifier#replacement(StringBuilder)}.<a name="line.87"></a>
-<FONT color="green">088</FONT>     * &lt;h3 href="#g3"&gt;3. How can I find out the position of the invalid characters<a name="line.88"></a>
-<FONT color="green">089</FONT>     * within the stream?&lt;/h3&gt; &lt;br/&gt;<a name="line.89"></a>
-<FONT color="green">090</FONT>     * &lt;p&gt;<a name="line.90"></a>
-<FONT color="green">091</FONT>     * You must count the characters that you skip. You can do this by subclassing<a name="line.91"></a>
-<FONT color="green">092</FONT>     * {@link InvalidXmlCharacterModifier} and overwrite<a name="line.92"></a>
-<FONT color="green">093</FONT>     * {@link Modifier#modify(StringBuilder, int, boolean)}.<a name="line.93"></a>
-<FONT color="green">094</FONT>     * &lt;p&gt;<a name="line.94"></a>
-<FONT color="green">095</FONT>     * You might find {@link LineColumnAwareModificationFactory} and<a name="line.95"></a>
-<FONT color="green">096</FONT>     * {@link PositionAwareModificationFactory} helpful as well.<a name="line.96"></a>
-<FONT color="green">097</FONT>     * &lt;h3 id="g4"&gt;4. How do I use this class with an {@link InputStream}?&lt;/h3&gt;<a name="line.97"></a>
-<FONT color="green">098</FONT>     * &lt;p&gt;<a name="line.98"></a>
-<FONT color="green">099</FONT>     * See<a name="line.99"></a>
-<FONT color="green">100</FONT>     * {@link ModifyingReaderFactory#createInvalidXmlCharacterRemovingModifier(java.io.InputStream)}.<a name="line.100"></a>
-<FONT color="green">101</FONT>     * &lt;h3 id="g5"&gt;5. How much memory does the modifier consume?&lt;/h3&gt;<a name="line.101"></a>
-<FONT color="green">102</FONT>     * &lt;p&gt;<a name="line.102"></a>
-<FONT color="green">103</FONT>     * The memory consumption of this modifier is roughly given by the first<a name="line.103"></a>
-<FONT color="green">104</FONT>     * argument of<a name="line.104"></a>
-<FONT color="green">105</FONT>     * {@link #InvalidXmlCharacterModifier(int, String, String, boolean)}.<a name="line.105"></a>
-<FONT color="green">106</FONT>     * &lt;p&gt;<a name="line.106"></a>
-<FONT color="green">107</FONT>     * &lt;h3 id="g5"&gt;6. When should I not use this modifier?&lt;/h3&gt;<a name="line.107"></a>
-<FONT color="green">108</FONT>     * &lt;p&gt;<a name="line.108"></a>
-<FONT color="green">109</FONT>     * Use {@link XmlVersionModifier} instead of this class if only the (wrong)<a name="line.109"></a>
-<FONT color="green">110</FONT>     * version in the prolog of the XML document restricts the range of valid<a name="line.110"></a>
-<FONT color="green">111</FONT>     * characters.<a name="line.111"></a>
-<FONT color="green">112</FONT>     * <a name="line.112"></a>
-<FONT color="green">113</FONT>     * @author rwoo<a name="line.113"></a>
-<FONT color="green">114</FONT>     * @since 23.06.2011<a name="line.114"></a>
-<FONT color="green">115</FONT>     */<a name="line.115"></a>
-<FONT color="green">116</FONT>    public class InvalidXmlCharacterModifier implements Modifier {<a name="line.116"></a>
-<FONT color="green">117</FONT>    <a name="line.117"></a>
-<FONT color="green">118</FONT>        /**<a name="line.118"></a>
-<FONT color="green">119</FONT>         * http://www.w3.org/TR/xml/#charsets (referring to the fifth edition of the<a name="line.119"></a>
-<FONT color="green">120</FONT>         * specification)<a name="line.120"></a>
-<FONT color="green">121</FONT>         */<a name="line.121"></a>
-<FONT color="green">122</FONT>        public static final String XML_10_VERSION = "1.0";<a name="line.122"></a>
-<FONT color="green">123</FONT>    <a name="line.123"></a>
-<FONT color="green">124</FONT>        /**<a name="line.124"></a>
-<FONT color="green">125</FONT>         * http://www.w3.org/TR/xml11/#charsets<a name="line.125"></a>
-<FONT color="green">126</FONT>         */<a name="line.126"></a>
-<FONT color="green">127</FONT>        public static final String XML_11_VERSION = "1.1";<a name="line.127"></a>
-<FONT color="green">128</FONT>    <a name="line.128"></a>
-<FONT color="green">129</FONT>    <a name="line.129"></a>
-<FONT color="green">130</FONT>        //<a name="line.130"></a>
-<FONT color="green">131</FONT>        // injected properties<a name="line.131"></a>
-<FONT color="green">132</FONT>        //<a name="line.132"></a>
-<FONT color="green">133</FONT>    <a name="line.133"></a>
-<FONT color="green">134</FONT>        protected ModificationFactory factory;<a name="line.134"></a>
-<FONT color="green">135</FONT>    <a name="line.135"></a>
-<FONT color="green">136</FONT>        /**<a name="line.136"></a>
-<FONT color="green">137</FONT>         * The replacement for each invalid XML character.<a name="line.137"></a>
-<FONT color="green">138</FONT>         */<a name="line.138"></a>
-<FONT color="green">139</FONT>        protected String replacement;<a name="line.139"></a>
-<FONT color="green">140</FONT>    <a name="line.140"></a>
-<FONT color="green">141</FONT>        /**<a name="line.141"></a>
-<FONT color="green">142</FONT>         * This matcher matches invalid XML characters.<a name="line.142"></a>
-<FONT color="green">143</FONT>         */<a name="line.143"></a>
-<FONT color="green">144</FONT>        protected Matcher matcher;<a name="line.144"></a>
-<FONT color="green">145</FONT>    <a name="line.145"></a>
-<FONT color="green">146</FONT>        /**<a name="line.146"></a>
-<FONT color="green">147</FONT>         * If this is true, then the string "$0" in the replacement is replaced with<a name="line.147"></a>
-<FONT color="green">148</FONT>         * the hexadecimal representation of the XML character.<a name="line.148"></a>
-<FONT color="green">149</FONT>         */<a name="line.149"></a>
-<FONT color="green">150</FONT>        protected boolean dollarZero;<a name="line.150"></a>
-<FONT color="green">151</FONT>    <a name="line.151"></a>
-<FONT color="green">152</FONT>    <a name="line.152"></a>
-<FONT color="green">153</FONT>        //<a name="line.153"></a>
-<FONT color="green">154</FONT>        // constructors<a name="line.154"></a>
-<FONT color="green">155</FONT>        //<a name="line.155"></a>
-<FONT color="green">156</FONT>    <a name="line.156"></a>
-<FONT color="green">157</FONT>        /**<a name="line.157"></a>
-<FONT color="green">158</FONT>         * Like<a name="line.158"></a>
-<FONT color="green">159</FONT>         * {@link InvalidXmlCharacterModifier#InvalidXmlCharacterModifier(int, String, String, boolean)}<a name="line.159"></a>
-<FONT color="green">160</FONT>         * but uses 8192 as default for &lt;code&gt;newNumberOfChars&lt;/code&gt; and sets<a name="line.160"></a>
-<FONT color="green">161</FONT>         * &lt;code&gt;dollarZero&lt;/code&gt; to true if the replacement string contains "$0".<a name="line.161"></a>
-<FONT color="green">162</FONT>         */<a name="line.162"></a>
-<FONT color="green">163</FONT>        public InvalidXmlCharacterModifier(String replacement, String xmlVersion) {<a name="line.163"></a>
-<FONT color="green">164</FONT>            this(8192, replacement, xmlVersion, replacement.contains("$0"));<a name="line.164"></a>
-<FONT color="green">165</FONT>        }<a name="line.165"></a>
-<FONT color="green">166</FONT>    <a name="line.166"></a>
-<FONT color="green">167</FONT>        /**<a name="line.167"></a>
-<FONT color="green">168</FONT>         * @param newNumberOfChars<a name="line.168"></a>
-<FONT color="green">169</FONT>         * @param replacement the string that shall replace invalid XML characters.<a name="line.169"></a>
-<FONT color="green">170</FONT>         *        This string may contain "$0" which refers to the replaced<a name="line.170"></a>
-<FONT color="green">171</FONT>         *        character, see {@link Matcher#replaceAll(String)}<a name="line.171"></a>
-<FONT color="green">172</FONT>         * @param xmlVersion Must not be &lt;code&gt;null&lt;/code&gt;.<a name="line.172"></a>
-<FONT color="green">173</FONT>         * @param dollarZero<a name="line.173"></a>
-<FONT color="green">174</FONT>         */<a name="line.174"></a>
-<FONT color="green">175</FONT>        public InvalidXmlCharacterModifier(int newNumberOfChars,<a name="line.175"></a>
-<FONT color="green">176</FONT>                String replacement, String xmlVersion, boolean dollarZero) {<a name="line.176"></a>
-<FONT color="green">177</FONT>    <a name="line.177"></a>
-<FONT color="green">178</FONT>            ZzzValidate.notNull(replacement, "replacement must not be null");<a name="line.178"></a>
-<FONT color="green">179</FONT>            ZzzValidate.notNull(xmlVersion, "xmlVersion must not be null");<a name="line.179"></a>
-<FONT color="green">180</FONT>    <a name="line.180"></a>
-<FONT color="green">181</FONT>            this.factory = new ModificationFactory(0, newNumberOfChars);<a name="line.181"></a>
-<FONT color="green">182</FONT>            this.replacement = replacement;<a name="line.182"></a>
-<FONT color="green">183</FONT>            this.dollarZero = dollarZero;<a name="line.183"></a>
-<FONT color="green">184</FONT>    <a name="line.184"></a>
-<FONT color="green">185</FONT>            // initialize matcher<a name="line.185"></a>
-<FONT color="green">186</FONT>            Pattern pattern;<a name="line.186"></a>
-<FONT color="green">187</FONT>            if (XML_10_VERSION.equals(xmlVersion)) {<a name="line.187"></a>
-<FONT color="green">188</FONT>                pattern = Pattern.compile(getInvalidXmlCharacterRegex_Xml10());<a name="line.188"></a>
-<FONT color="green">189</FONT>            }<a name="line.189"></a>
-<FONT color="green">190</FONT>            else if (XML_11_VERSION.equals(xmlVersion)) {<a name="line.190"></a>
-<FONT color="green">191</FONT>                pattern = Pattern.compile(getInvalidXmlCharacterRegex_Xml11());<a name="line.191"></a>
-<FONT color="green">192</FONT>            }<a name="line.192"></a>
-<FONT color="green">193</FONT>            else {<a name="line.193"></a>
-<FONT color="green">194</FONT>                throw new IllegalArgumentException("xmlVersion has the illegal "<a name="line.194"></a>
-<FONT color="green">195</FONT>                        + "(or unsupported) value " + xmlVersion);<a name="line.195"></a>
-<FONT color="green">196</FONT>            }<a name="line.196"></a>
-<FONT color="green">197</FONT>            this.matcher = pattern.matcher("");<a name="line.197"></a>
-<FONT color="green">198</FONT>        }<a name="line.198"></a>
-<FONT color="green">199</FONT>    <a name="line.199"></a>
-<FONT color="green">200</FONT>    <a name="line.200"></a>
-<FONT color="green">201</FONT>        /**<a name="line.201"></a>
-<FONT color="green">202</FONT>         * &lt;pre&gt;<a name="line.202"></a>
-<FONT color="green">203</FONT>         *      [2]    Char       ::=      #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]<a name="line.203"></a>
-<FONT color="green">204</FONT>         *       // any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.<a name="line.204"></a>
-<FONT color="green">205</FONT>         * &lt;/pre&gt;<a name="line.205"></a>
-<FONT color="green">206</FONT>         * <a name="line.206"></a>
-<FONT color="green">207</FONT>         * [Source: http://www.w3.org/TR/xml/#charsets ]<a name="line.207"></a>
-<FONT color="green">208</FONT>         * <a name="line.208"></a>
-<FONT color="green">209</FONT>         * @return Returns a regular expression that matches invalid XML 1.0<a name="line.209"></a>
-<FONT color="green">210</FONT>         *         characters.<a name="line.210"></a>
-<FONT color="green">211</FONT>         */<a name="line.211"></a>
-<FONT color="green">212</FONT>        protected String getInvalidXmlCharacterRegex_Xml10() {<a name="line.212"></a>
-<FONT color="green">213</FONT>            // Most characters are probably from the range U+0020 -U+D7FF.<a name="line.213"></a>
-<FONT color="green">214</FONT>            // Therefore, in order to optimize performance, we move this range to<a name="line.214"></a>
-<FONT color="green">215</FONT>            // the start of the regular expression.<a name="line.215"></a>
-<FONT color="green">216</FONT>            return "[^\\u0020-\\uD7FF\\u0009\\u000A\\u000D\\uE000-\\uFFFD\\u10000-\\u10FFFF]";<a name="line.216"></a>
-<FONT color="green">217</FONT>        }<a name="line.217"></a>
-<FONT color="green">218</FONT>    <a name="line.218"></a>
-<FONT color="green">219</FONT>        /**<a name="line.219"></a>
-<FONT color="green">220</FONT>         * &lt;pre&gt;<a name="line.220"></a>
-<FONT color="green">221</FONT>         * [2]     Char       ::=      [#x1-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]<a name="line.221"></a>
-<FONT color="green">222</FONT>         * // any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.<a name="line.222"></a>
-<FONT color="green">223</FONT>         * &lt;/pre&gt;<a name="line.223"></a>
-<FONT color="green">224</FONT>         * <a name="line.224"></a>
-<FONT color="green">225</FONT>         * [Source: http://www.w3.org/TR/xml11/#charsets ]<a name="line.225"></a>
-<FONT color="green">226</FONT>         * <a name="line.226"></a>
-<FONT color="green">227</FONT>         * @return Returns a regular expression that matches invalid XML 1.1<a name="line.227"></a>
-<FONT color="green">228</FONT>         *         characters.<a name="line.228"></a>
-<FONT color="green">229</FONT>         */<a name="line.229"></a>
-<FONT color="green">230</FONT>        protected String getInvalidXmlCharacterRegex_Xml11() {<a name="line.230"></a>
-<FONT color="green">231</FONT>            return "[^\\u0001-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]";<a name="line.231"></a>
-<FONT color="green">232</FONT>        }<a name="line.232"></a>
-<FONT color="green">233</FONT>    <a name="line.233"></a>
-<FONT color="green">234</FONT>        //<a name="line.234"></a>
-<FONT color="green">235</FONT>        // override Modifier.*<a name="line.235"></a>
-<FONT color="green">236</FONT>        //<a name="line.236"></a>
-<FONT color="green">237</FONT>    <a name="line.237"></a>
-<FONT color="green">238</FONT>        /**<a name="line.238"></a>
-<FONT color="green">239</FONT>         * @see com.googlecode.streamflyer.core.Modifier#modify(java.lang.StringBuilder,<a name="line.239"></a>
-<FONT color="green">240</FONT>         *      int, boolean)<a name="line.240"></a>
-<FONT color="green">241</FONT>         */<a name="line.241"></a>
-<FONT color="green">242</FONT>        @Override<a name="line.242"></a>
-<FONT color="green">243</FONT>        public AfterModification modify(StringBuilder characterBuffer,<a name="line.243"></a>
-<FONT color="green">244</FONT>                int firstModifiableCharacterInBuffer, boolean endOfStreamHit) {<a name="line.244"></a>
-<FONT color="green">245</FONT>    <a name="line.245"></a>
-<FONT color="green">246</FONT>            matcher.reset(characterBuffer);<a name="line.246"></a>
-<FONT color="green">247</FONT>            matcher.region(firstModifiableCharacterInBuffer,<a name="line.247"></a>
-<FONT color="green">248</FONT>                    characterBuffer.length());<a name="line.248"></a>
-<FONT color="green">249</FONT>    <a name="line.249"></a>
-<FONT color="green">250</FONT>            // String newCharacterBuffer = matcher.replaceAll(replacement);<a name="line.250"></a>
-<FONT color="green">251</FONT>            // characterBuffer.setLength(0);<a name="line.251"></a>
-<FONT color="green">252</FONT>            // characterBuffer.append(newCharacterBuffer);<a name="line.252"></a>
-<FONT color="green">253</FONT>    <a name="line.253"></a>
-<FONT color="green">254</FONT>            int start = firstModifiableCharacterInBuffer;<a name="line.254"></a>
-<FONT color="green">255</FONT>            while (matcher.find(start)) {<a name="line.255"></a>
-<FONT color="green">256</FONT>                start = onMatch(characterBuffer);<a name="line.256"></a>
-<FONT color="green">257</FONT>            }<a name="line.257"></a>
-<FONT color="green">258</FONT>    <a name="line.258"></a>
-<FONT color="green">259</FONT>            return factory.skipEntireBuffer(characterBuffer,<a name="line.259"></a>
-<FONT color="green">260</FONT>                    firstModifiableCharacterInBuffer, endOfStreamHit);<a name="line.260"></a>
-<FONT color="green">261</FONT>        }<a name="line.261"></a>
-<FONT color="green">262</FONT>    <a name="line.262"></a>
-<FONT color="green">263</FONT>        /**<a name="line.263"></a>
-<FONT color="green">264</FONT>         * Replaces the found invalid XML character with the given replacement.<a name="line.264"></a>
-<FONT color="green">265</FONT>         * &lt;p&gt;<a name="line.265"></a>
-<FONT color="green">266</FONT>         * You may override this method to insert some information about invalid<a name="line.266"></a>
-<FONT color="green">267</FONT>         * character in to the character buffer.<a name="line.267"></a>
-<FONT color="green">268</FONT>         * <a name="line.268"></a>
-<FONT color="green">269</FONT>         * @param characterBuffer<a name="line.269"></a>
-<FONT color="green">270</FONT>         */<a name="line.270"></a>
-<FONT color="green">271</FONT>        protected int onMatch(StringBuilder characterBuffer) {<a name="line.271"></a>
-<FONT color="green">272</FONT>    <a name="line.272"></a>
-<FONT color="green">273</FONT>            String replacement_ = replacement(characterBuffer);<a name="line.273"></a>
-<FONT color="green">274</FONT>            characterBuffer.replace(matcher.start(), matcher.end(), replacement_);<a name="line.274"></a>
-<FONT color="green">275</FONT>    <a name="line.275"></a>
-<FONT color="green">276</FONT>            // calling reset(..) is redundant as find(start) calls reset() first<a name="line.276"></a>
-<FONT color="green">277</FONT>            // if (replacement_.length() != 1) {<a name="line.277"></a>
-<FONT color="green">278</FONT>            // matcher.reset(characterBuffer);<a name="line.278"></a>
-<FONT color="green">279</FONT>            // }<a name="line.279"></a>
-<FONT color="green">280</FONT>    <a name="line.280"></a>
-<FONT color="green">281</FONT>            return matcher.start() + replacement_.length();<a name="line.281"></a>
-<FONT color="green">282</FONT>    <a name="line.282"></a>
-<FONT color="green">283</FONT>        }<a name="line.283"></a>
-<FONT color="green">284</FONT>    <a name="line.284"></a>
-<FONT color="green">285</FONT>        protected String replacement(StringBuilder characterBuffer) {<a name="line.285"></a>
-<FONT color="green">286</FONT>            if (dollarZero) {<a name="line.286"></a>
-<FONT color="green">287</FONT>    <a name="line.287"></a>
-<FONT color="green">288</FONT>                // character formatted as "U+\d{4}"<a name="line.288"></a>
-<FONT color="green">289</FONT>                char ch = characterBuffer.charAt(matcher.start());<a name="line.289"></a>
-<FONT color="green">290</FONT>                String chHex = Integer.toString(ch, 16).toUpperCase();<a name="line.290"></a>
-<FONT color="green">291</FONT>                while (chHex.length() &lt; 4) {<a name="line.291"></a>
-<FONT color="green">292</FONT>                    chHex = "0" + chHex;<a name="line.292"></a>
-<FONT color="green">293</FONT>                }<a name="line.293"></a>
-<FONT color="green">294</FONT>                chHex = "U+" + chHex;<a name="line.294"></a>
-<FONT color="green">295</FONT>    <a name="line.295"></a>
-<FONT color="green">296</FONT>                // TODO should I do some caching of chHex to improve performance?<a name="line.296"></a>
-<FONT color="green">297</FONT>    <a name="line.297"></a>
-<FONT color="green">298</FONT>                return replacement.replace("$0", chHex);<a name="line.298"></a>
-<FONT color="green">299</FONT>            }<a name="line.299"></a>
-<FONT color="green">300</FONT>            else {<a name="line.300"></a>
-<FONT color="green">301</FONT>                return replacement;<a name="line.301"></a>
-<FONT color="green">302</FONT>            }<a name="line.302"></a>
-<FONT color="green">303</FONT>        }<a name="line.303"></a>
-<FONT color="green">304</FONT>    <a name="line.304"></a>
-<FONT color="green">305</FONT>    <a name="line.305"></a>
-<FONT color="green">306</FONT>        //<a name="line.306"></a>
-<FONT color="green">307</FONT>        // override Object.*<a name="line.307"></a>
-<FONT color="green">308</FONT>        //<a name="line.308"></a>
-<FONT color="green">309</FONT>    <a name="line.309"></a>
-<FONT color="green">310</FONT>    <a name="line.310"></a>
-<FONT color="green">311</FONT>        /**<a name="line.311"></a>
-<FONT color="green">312</FONT>         * @see java.lang.Object#toString()<a name="line.312"></a>
-<FONT color="green">313</FONT>         */<a name="line.313"></a>
-<FONT color="green">314</FONT>        @Override<a name="line.314"></a>
-<FONT color="green">315</FONT>        public String toString() {<a name="line.315"></a>
-<FONT color="green">316</FONT>            StringBuilder builder = new StringBuilder();<a name="line.316"></a>
-<FONT color="green">317</FONT>            builder.append("InvalidXmlCharacterModifier [\nreplacement=");<a name="line.317"></a>
-<FONT color="green">318</FONT>            builder.append(replacement);<a name="line.318"></a>
-<FONT color="green">319</FONT>            builder.append(", \nmatcher=");<a name="line.319"></a>
-<FONT color="green">320</FONT>            builder.append(matcher);<a name="line.320"></a>
-<FONT color="green">321</FONT>            builder.append(", \ndollarZero=");<a name="line.321"></a>
-<FONT color="green">322</FONT>            builder.append(dollarZero);<a name="line.322"></a>
-<FONT color="green">323</FONT>            builder.append("]");<a name="line.323"></a>
-<FONT color="green">324</FONT>            return builder.toString();<a name="line.324"></a>
-<FONT color="green">325</FONT>        }<a name="line.325"></a>
-<FONT color="green">326</FONT>    <a name="line.326"></a>
-<FONT color="green">327</FONT>    <a name="line.327"></a>
-<FONT color="green">328</FONT>    }<a name="line.328"></a>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Copyright (C) 2011 rwoo@gmx.de<a name="line.2"></a>
+<span class="sourceLineNo">003</span> *<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * Licensed under the Apache License, Version 2.0 (the "License");<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * you may not use this file except in compliance with the License.<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * You may obtain a copy of the License at<a name="line.6"></a>
+<span class="sourceLineNo">007</span> *<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *         http://www.apache.org/licenses/LICENSE-2.0<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *<a name="line.9"></a>
+<span class="sourceLineNo">010</span> * Unless required by applicable law or agreed to in writing, software<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * See the License for the specific language governing permissions and<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * limitations under the License.<a name="line.14"></a>
+<span class="sourceLineNo">015</span> */<a name="line.15"></a>
+<span class="sourceLineNo">016</span><a name="line.16"></a>
+<span class="sourceLineNo">017</span>package com.googlecode.streamflyer.xml;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.io.InputStream;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.util.regex.Matcher;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.regex.Pattern;<a name="line.21"></a>
+<span class="sourceLineNo">022</span><a name="line.22"></a>
+<span class="sourceLineNo">023</span>import com.googlecode.streamflyer.core.AfterModification;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import com.googlecode.streamflyer.core.Modifier;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import com.googlecode.streamflyer.internal.thirdparty.ZzzValidate;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import com.googlecode.streamflyer.util.ModificationFactory;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import com.googlecode.streamflyer.util.ModifyingReaderFactory;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import com.googlecode.streamflyer.util.statistics.LineColumnAwareModificationFactory;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import com.googlecode.streamflyer.util.statistics.PositionAwareModificationFactory;<a name="line.29"></a>
+<span class="sourceLineNo">030</span><a name="line.30"></a>
+<span class="sourceLineNo">031</span>/**<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * This modifier replaces invalid XML characters in an stream that contains an<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * XML document.<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * &lt;p&gt;<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;h1&gt;Contents&lt;/h1&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * &lt;p&gt;<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * &lt;b&gt; &lt;a href="#g1"&gt;1. How do I use this modifier?&lt;/a&gt;&lt;br/&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * &lt;a href="#g2"&gt;2. In addition to the replacement of the invalid characters I<a name="line.38"></a>
+<span class="sourceLineNo">039</span> * want to record the replacements and sent notifications. How can I do<a name="line.39"></a>
+<span class="sourceLineNo">040</span> * this?&lt;/a&gt; &lt;br/&gt;<a name="line.40"></a>
+<span class="sourceLineNo">041</span> * &lt;a href="#g3"&gt;3. How can I find out the position of the matches within the<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * stream?&lt;/a&gt; &lt;br/&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span> * &lt;a href="#g4"&gt;4. How do I use this class with an {@link InputStream}?&lt;/a&gt;&lt;br/&gt;<a name="line.43"></a>
+<span class="sourceLineNo">044</span> * &lt;a href="#g5"&gt;5. How much memory does the modifier consume?&lt;/a&gt;&lt;br/&gt;<a name="line.44"></a>
+<span class="sourceLineNo">045</span> * &lt;a href="#g6"&gt;6. When should I not use this modifier?&lt;/a&gt;&lt;br/&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> * &lt;/b&gt; &lt;!-- ++++++++++++++++++++++++++++++ --&gt;<a name="line.46"></a>
+<span class="sourceLineNo">047</span> * &lt;p&gt;<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * &lt;h3 id="g1"&gt;1. How do I use this modifier?&lt;/h3&gt;<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * &lt;p&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * EXAMPLE 1. This example shows how to remove the invalid characters:<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * &lt;code&gt;&lt;pre class="prettyprint lang-java"&gt;// choose the character stream to modify<a name="line.51"></a>
+<span class="sourceLineNo">052</span>Reader reader = new StringReader("foo\uD8FFbar");<a name="line.52"></a>
+<span class="sourceLineNo">053</span><a name="line.53"></a>
+<span class="sourceLineNo">054</span>// define what and how to replace (the empty string as replacement)<a name="line.54"></a>
+<span class="sourceLineNo">055</span>Modifier modifier = new InvalidXmlCharacterModifier("",<a name="line.55"></a>
+<span class="sourceLineNo">056</span>        InvalidXmlCharacterModifier.XML_11_VERSION);<a name="line.56"></a>
+<span class="sourceLineNo">057</span><a name="line.57"></a>
+<span class="sourceLineNo">058</span>// create the modifying reader that wraps the original reader<a name="line.58"></a>
+<span class="sourceLineNo">059</span>ModifyingReader modifyingReader = new ModifyingReader(reader, modifier);<a name="line.59"></a>
+<span class="sourceLineNo">060</span><a name="line.60"></a>
+<span class="sourceLineNo">061</span>// use the modifying reader instead of the original reader<a name="line.61"></a>
+<span class="sourceLineNo">062</span>String actualOutput = IOUtils.toString(modifyingReader);<a name="line.62"></a>
+<span class="sourceLineNo">063</span><a name="line.63"></a>
+<span class="sourceLineNo">064</span>assertEquals("foobar", actualOutput);&lt;/pre&gt;&lt;/code&gt;<a name="line.64"></a>
+<span class="sourceLineNo">065</span> * &lt;p&gt;<a name="line.65"></a>
+<span class="sourceLineNo">066</span> * EXAMPLE 2. This example shows how to replace the invalid characters with an<a name="line.66"></a>
+<span class="sourceLineNo">067</span> * error message:<a name="line.67"></a>
+<span class="sourceLineNo">068</span> * &lt;code&gt;&lt;pre class="prettyprint lang-java"&gt;// choose the character stream to modify<a name="line.68"></a>
+<span class="sourceLineNo">069</span>Reader reader = new StringReader("foo\uD8FFbar");<a name="line.69"></a>
+<span class="sourceLineNo">070</span><a name="line.70"></a>
+<span class="sourceLineNo">071</span>// define what and how to replace (an error message as replacement)<a name="line.71"></a>
+<span class="sourceLineNo">072</span>Modifier modifier = new InvalidXmlCharacterModifier(<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        "[INVALID XML CHAR FOUND: $0]",<a name="line.73"></a>
+<span class="sourceLineNo">074</span>        InvalidXmlCharacterModifier.XML_11_VERSION);<a name="line.74"></a>
+<span class="sourceLineNo">075</span><a name="line.75"></a>
+<span class="sourceLineNo">076</span>// create the modifying reader that wraps the original reader<a name="line.76"></a>
+<span class="sourceLineNo">077</span>ModifyingReader modifyingReader = new ModifyingReader(reader, modifier);<a name="line.77"></a>
+<span class="sourceLineNo">078</span><a name="line.78"></a>
+<span class="sourceLineNo">079</span>// use the modifying reader instead of the original reader<a name="line.79"></a>
+<span class="sourceLineNo">080</span>String actualOutput = IOUtils.toString(modifyingReader);<a name="line.80"></a>
+<span class="sourceLineNo">081</span><a name="line.81"></a>
+<span class="sourceLineNo">082</span>assertEquals("foo[INVALID XML CHAR FOUND: U+D8FF]bar", actualOutput);&lt;/pre&gt;&lt;/code&gt;<a name="line.82"></a>
+<span class="sourceLineNo">083</span> * &lt;h3 id="g2"&gt;2. In addition to the replacement of the invalid characters I<a name="line.83"></a>
+<span class="sourceLineNo">084</span> * want to record the replacements and sent notifications. How can I do this?&lt;/h3&gt;<a name="line.84"></a>
+<span class="sourceLineNo">085</span> * &lt;p&gt;<a name="line.85"></a>
+<span class="sourceLineNo">086</span> * Subclass {@link InvalidXmlCharacterModifier} and override<a name="line.86"></a>
+<span class="sourceLineNo">087</span> * {@link InvalidXmlCharacterModifier#replacement(StringBuilder)}.<a name="line.87"></a>
+<span class="sourceLineNo">088</span> * &lt;h3 href="#g3"&gt;3. How can I find out the position of the invalid characters<a name="line.88"></a>
+<span class="sourceLineNo">089</span> * within the stream?&lt;/h3&gt; &lt;br/&gt;<a name="line.89"></a>
+<span class="sourceLineNo">090</span> * &lt;p&gt;<a name="line.90"></a>
+<span class="sourceLineNo">091</span> * You must count the characters that you skip. You can do this by subclassing<a name="line.91"></a>
+<span class="sourceLineNo">092</span> * {@link InvalidXmlCharacterModifier} and overwrite<a name="line.92"></a>
+<span class="sourceLineNo">093</span> * {@link Modifier#modify(StringBuilder, int, boolean)}.<a name="line.93"></a>
+<span class="sourceLineNo">094</span> * &lt;p&gt;<a name="line.94"></a>
+<span class="sourceLineNo">095</span> * You might find {@link LineColumnAwareModificationFactory} and<a name="line.95"></a>
+<span class="sourceLineNo">096</span> * {@link PositionAwareModificationFactory} helpful as well.<a name="line.96"></a>
+<span class="sourceLineNo">097</span> * &lt;h3 id="g4"&gt;4. How do I use this class with an {@link InputStream}?&lt;/h3&gt;<a name="line.97"></a>
+<span class="sourceLineNo">098</span> * &lt;p&gt;<a name="line.98"></a>
+<span class="sourceLineNo">099</span> * See<a name="line.99"></a>
+<span class="sourceLineNo">100</span> * {@link ModifyingReaderFactory#createInvalidXmlCharacterRemovingModifier(java.io.InputStream)}.<a name="line.100"></a>
+<span class="sourceLineNo">101</span> * &lt;h3 id="g5"&gt;5. How much memory does the modifier consume?&lt;/h3&gt;<a name="line.101"></a>
+<span class="sourceLineNo">102</span> * &lt;p&gt;<a name="line.102"></a>
+<span class="sourceLineNo">103</span> * The memory consumption of this modifier is roughly given by the first<a name="line.103"></a>
+<span class="sourceLineNo">104</span> * argument of<a name="line.104"></a>
+<span class="sourceLineNo">105</span> * {@link #InvalidXmlCharacterModifier(int, String, String, boolean)}.<a name="line.105"></a>
+<span class="sourceLineNo">106</span> * &lt;p&gt;<a name="line.106"></a>
+<span class="sourceLineNo">107</span> * &lt;h3 id="g5"&gt;6. When should I not use this modifier?&lt;/h3&gt;<a name="line.107"></a>
+<span class="sourceLineNo">108</span> * &lt;p&gt;<a name="line.108"></a>
+<span class="sourceLineNo">109</span> * Use {@link XmlVersionModifier} instead of this class if only the (wrong)<a name="line.109"></a>
+<span class="sourceLineNo">110</span> * version in the prolog of the XML document restricts the range of valid<a name="line.110"></a>
+<span class="sourceLineNo">111</span> * characters.<a name="line.111"></a>
+<span class="sourceLineNo">112</span> * <a name="line.112"></a>
+<span class="sourceLineNo">113</span> * @author rwoo<a name="line.113"></a>
+<span class="sourceLineNo">114</span> * @since 23.06.2011<a name="line.114"></a>
+<span class="sourceLineNo">115</span> */<a name="line.115"></a>
+<span class="sourceLineNo">116</span>public class InvalidXmlCharacterModifier implements Modifier {<a name="line.116"></a>
+<span class="sourceLineNo">117</span><a name="line.117"></a>
+<span class="sourceLineNo">118</span>    /**<a name="line.118"></a>
+<span class="sourceLineNo">119</span>     * http://www.w3.org/TR/xml/#charsets (referring to the fifth edition of the<a name="line.119"></a>
+<span class="sourceLineNo">120</span>     * specification)<a name="line.120"></a>
+<span class="sourceLineNo">121</span>     */<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    public static final String XML_10_VERSION = "1.0";<a name="line.122"></a>
+<span class="sourceLineNo">123</span><a name="line.123"></a>
+<span class="sourceLineNo">124</span>    /**<a name="line.124"></a>
+<span class="sourceLineNo">125</span>     * http://www.w3.org/TR/xml11/#charsets<a name="line.125"></a>
+<span class="sourceLineNo">126</span>     */<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    public static final String XML_11_VERSION = "1.1";<a name="line.127"></a>
+<span class="sourceLineNo">128</span><a name="line.128"></a>
+<span class="sourceLineNo">129</span><a name="line.129"></a>
+<span class="sourceLineNo">130</span>    //<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    // injected properties<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    //<a name="line.132"></a>
+<span class="sourceLineNo">133</span><a name="line.133"></a>
+<span class="sourceLineNo">134</span>    protected ModificationFactory factory;<a name="line.134"></a>
+<span class="sourceLineNo">135</span><a name="line.135"></a>
+<span class="sourceLineNo">136</span>    /**<a name="line.136"></a>
+<span class="sourceLineNo">137</span>     * The replacement for each invalid XML character.<a name="line.137"></a>
+<span class="sourceLineNo">138</span>     */<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    protected String replacement;<a name="line.139"></a>
+<span class="sourceLineNo">140</span><a name="line.140"></a>
+<span class="sourceLineNo">141</span>    /**<a name="line.141"></a>
+<span class="sourceLineNo">142</span>     * This matcher matches invalid XML characters.<a name="line.142"></a>
+<span class="sourceLineNo">143</span>     */<a name="line.143"></a>
+<span class="sourceLineNo">144</span>    protected Matcher matcher;<a name="line.144"></a>
+<span class="sourceLineNo">145</span><a name="line.145"></a>
+<span class="sourceLineNo">146</span>    /**<a name="line.146"></a>
+<span class="sourceLineNo">147</span>     * If this is true, then the string "$0" in the replacement is replaced with<a name="line.147"></a>
+<span class="sourceLineNo">148</span>     * the hexadecimal representation of the XML character.<a name="line.148"></a>
+<span class="sourceLineNo">149</span>     */<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    protected boolean dollarZero;<a name="line.150"></a>
+<span class="sourceLineNo">151</span><a name="line.151"></a>
+<span class="sourceLineNo">152</span><a name="line.152"></a>
+<span class="sourceLineNo">153</span>    //<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    // constructors<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    //<a name="line.155"></a>
+<span class="sourceLineNo">156</span><a name="line.156"></a>
+<span class="sourceLineNo">157</span>    /**<a name="line.157"></a>
+<span class="sourceLineNo">158</span>     * Like<a name="line.158"></a>
+<span class="sourceLineNo">159</span>     * {@link InvalidXmlCharacterModifier#InvalidXmlCharacterModifier(int, String, String, boolean)}<a name="line.159"></a>
+<span class="sourceLineNo">160</span>     * but uses 8192 as default for &lt;code&gt;newNumberOfChars&lt;/code&gt; and sets<a name="line.160"></a>
+<span class="sourceLineNo">161</span>     * &lt;code&gt;dollarZero&lt;/code&gt; to true if the replacement string contains "$0".<a name="line.161"></a>
+<span class="sourceLineNo">162</span>     */<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    public InvalidXmlCharacterModifier(String replacement, String xmlVersion) {<a name="line.163"></a>
+<span class="sourceLineNo">164</span>        this(8192, replacement, xmlVersion, replacement.contains("$0"));<a name="line.164"></a>
+<span class="sourceLineNo">165</span>    }<a name="line.165"></a>
+<span class="sourceLineNo">166</span><a name="line.166"></a>
+<span class="sourceLineNo">167</span>    /**<a name="line.167"></a>
+<span class="sourceLineNo">168</span>     * @param newNumberOfChars<a name="line.168"></a>
+<span class="sourceLineNo">169</span>     * @param replacement the string that shall replace invalid XML characters.<a name="line.169"></a>
+<span class="sourceLineNo">170</span>     *        This string may contain "$0" which refers to the replaced<a name="line.170"></a>
+<span class="sourceLineNo">171</span>     *        character, see {@link Matcher#replaceAll(String)}<a name="line.171"></a>
+<span class="sourceLineNo">172</span>     * @param xmlVersion Must not be &lt;code&gt;null&lt;/code&gt;.<a name="line.172"></a>
+<span class="sourceLineNo">173</span>     * @param dollarZero<a name="line.173"></a>
+<span class="sourceLineNo">174</span>     */<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    public InvalidXmlCharacterModifier(int newNumberOfChars,<a name="line.175"></a>
+<span class="sourceLineNo">176</span>            String replacement, String xmlVersion, boolean dollarZero) {<a name="line.176"></a>
+<span class="sourceLineNo">177</span><a name="line.177"></a>
+<span class="sourceLineNo">178</span>        ZzzValidate.notNull(replacement, "replacement must not be null");<a name="line.178"></a>
+<span class="sourceLineNo">179</span>        ZzzValidate.notNull(xmlVersion, "xmlVersion must not be null");<a name="line.179"></a>
+<span class="sourceLineNo">180</span><a name="line.180"></a>
+<span class="sourceLineNo">181</span>        this.factory = new ModificationFactory(0, newNumberOfChars);<a name="line.181"></a>
+<span class="sourceLineNo">182</span>        this.replacement = replacement;<a name="line.182"></a>
+<span class="sourceLineNo">183</span>        this.dollarZero = dollarZero;<a name="line.183"></a>
+<span class="sourceLineNo">184</span><a name="line.184"></a>
+<span class="sourceLineNo">185</span>        // initialize matcher<a name="line.185"></a>
+<span class="sourceLineNo">186</span>        Pattern pattern;<a name="line.186"></a>
+<span class="sourceLineNo">187</span>        if (XML_10_VERSION.equals(xmlVersion)) {<a name="line.187"></a>
+<span class="sourceLineNo">188</span>            pattern = Pattern.compile(getInvalidXmlCharacterRegex_Xml10());<a name="line.188"></a>
+<span class="sourceLineNo">189</span>        }<a name="line.189"></a>
+<span class="sourceLineNo">190</span>        else if (XML_11_VERSION.equals(xmlVersion)) {<a name="line.190"></a>
+<span class="sourceLineNo">191</span>            pattern = Pattern.compile(getInvalidXmlCharacterRegex_Xml11());<a name="line.191"></a>
+<span class="sourceLineNo">192</span>        }<a name="line.192"></a>
+<span class="sourceLineNo">193</span>        else {<a name="line.193"></a>
+<span class="sourceLineNo">194</span>            throw new IllegalArgumentException("xmlVersion has the illegal "<a name="line.194"></a>
+<span class="sourceLineNo">195</span>                    + "(or unsupported) value " + xmlVersion);<a name="line.195"></a>
+<span class="sourceLineNo">196</span>        }<a name="line.196"></a>
+<span class="sourceLineNo">197</span>        this.matcher = pattern.matcher("");<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    }<a name="line.198"></a>
+<span class="sourceLineNo">199</span><a name="line.199"></a>
+<span class="sourceLineNo">200</span><a name="line.200"></a>
+<span class="sourceLineNo">201</span>    /**<a name="line.201"></a>
+<span class="sourceLineNo">202</span>     * &lt;pre&gt;<a name="line.202"></a>
+<span class="sourceLineNo">203</span>     *      [2]    Char       ::=      #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]<a name="line.203"></a>
+<span class="sourceLineNo">204</span>     *       // any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.<a name="line.204"></a>
+<span class="sourceLineNo">205</span>     * &lt;/pre&gt;<a name="line.205"></a>
+<span class="sourceLineNo">206</span>     * <a name="line.206"></a>
+<span class="sourceLineNo">207</span>     * [Source: http://www.w3.org/TR/xml/#charsets ]<a name="line.207"></a>
+<span class="sourceLineNo">208</span>     * <a name="line.208"></a>
+<span class="sourceLineNo">209</span>     * @return Returns a regular expression that matches invalid XML 1.0<a name="line.209"></a>
+<span class="sourceLineNo">210</span>     *         characters.<a name="line.210"></a>
+<span class="sourceLineNo">211</span>     */<a name="line.211"></a>
+<span class="sourceLineNo">212</span>    protected String getInvalidXmlCharacterRegex_Xml10() {<a name="line.212"></a>
+<span class="sourceLineNo">213</span>        // Most characters are probably from the range U+0020 -U+D7FF.<a name="line.213"></a>
+<span class="sourceLineNo">214</span>        // Therefore, in order to optimize performance, we move this range to<a name="line.214"></a>
+<span class="sourceLineNo">215</span>        // the start of the regular expression.<a name="line.215"></a>
+<span class="sourceLineNo">216</span>        return "[^\\u0020-\\uD7FF\\u0009\\u000A\\u000D\\uE000-\\uFFFD\\u10000-\\u10FFFF]";<a name="line.216"></a>
+<span class="sourceLineNo">217</span>    }<a name="line.217"></a>
+<span class="sourceLineNo">218</span><a name="line.218"></a>
+<span class="sourceLineNo">219</span>    /**<a name="line.219"></a>
+<span class="sourceLineNo">220</span>     * &lt;pre&gt;<a name="line.220"></a>
+<span class="sourceLineNo">221</span>     * [2]     Char       ::=      [#x1-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]<a name="line.221"></a>
+<span class="sourceLineNo">222</span>     * // any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.<a name="line.222"></a>
+<span class="sourceLineNo">223</span>     * &lt;/pre&gt;<a name="line.223"></a>
+<span class="sourceLineNo">224</span>     * <a name="line.224"></a>
+<span class="sourceLineNo">225</span>     * [Source: http://www.w3.org/TR/xml11/#charsets ]<a name="line.225"></a>
+<span class="sourceLineNo">226</span>     * <a name="line.226"></a>
+<span class="sourceLineNo">227</span>     * @return Returns a regular expression that matches invalid XML 1.1<a name="line.227"></a>
+<span class="sourceLineNo">228</span>     *         characters.<a name="line.228"></a>
+<span class="sourceLineNo">229</span>     */<a name="line.229"></a>
+<span class="sourceLineNo">230</span>    protected String getInvalidXmlCharacterRegex_Xml11() {<a name="line.230"></a>
+<span class="sourceLineNo">231</span>        return "[^\\u0001-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]";<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    }<a name="line.232"></a>
+<span class="sourceLineNo">233</span><a name="line.233"></a>
+<span class="sourceLineNo">234</span>    //<a name="line.234"></a>
+<span class="sourceLineNo">235</span>    // override Modifier.*<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    //<a name="line.236"></a>
+<span class="sourceLineNo">237</span><a name="line.237"></a>
+<span class="sourceLineNo">238</span>    /**<a name="line.238"></a>
+<span class="sourceLineNo">239</span>     * @see com.googlecode.streamflyer.core.Modifier#modify(java.lang.StringBuilder,<a name="line.239"></a>
+<span class="sourceLineNo">240</span>     *      int, boolean)<a name="line.240"></a>
+<span class="sourceLineNo">241</span>     */<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    @Override<a name="line.242"></a>
+<span class="sourceLineNo">243</span>    public AfterModification modify(StringBuilder characterBuffer,<a name="line.243"></a>
+<span class="sourceLineNo">244</span>            int firstModifiableCharacterInBuffer, boolean endOfStreamHit) {<a name="line.244"></a>
+<span class="sourceLineNo">245</span><a name="line.245"></a>
+<span class="sourceLineNo">246</span>        matcher.reset(characterBuffer);<a name="line.246"></a>
+<span class="sourceLineNo">247</span>        matcher.region(firstModifiableCharacterInBuffer,<a name="line.247"></a>
+<span class="sourceLineNo">248</span>                characterBuffer.length());<a name="line.248"></a>
+<span class="sourceLineNo">249</span><a name="line.249"></a>
+<span class="sourceLineNo">250</span>        // String newCharacterBuffer = matcher.replaceAll(replacement);<a name="line.250"></a>
+<span class="sourceLineNo">251</span>        // characterBuffer.setLength(0);<a name="line.251"></a>
+<span class="sourceLineNo">252</span>        // characterBuffer.append(newCharacterBuffer);<a name="line.252"></a>
+<span class="sourceLineNo">253</span><a name="line.253"></a>
+<span class="sourceLineNo">254</span>        int start = firstModifiableCharacterInBuffer;<a name="line.254"></a>
+<span class="sourceLineNo">255</span>        while (matcher.find(start)) {<a name="line.255"></a>
+<span class="sourceLineNo">256</span>            start = onMatch(characterBuffer);<a name="line.256"></a>
+<span class="sourceLineNo">257</span>        }<a name="line.257"></a>
+<span class="sourceLineNo">258</span><a name="line.258"></a>
+<span class="sourceLineNo">259</span>        return factory.skipEntireBuffer(characterBuffer,<a name="line.259"></a>
+<span class="sourceLineNo">260</span>                firstModifiableCharacterInBuffer, endOfStreamHit);<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    }<a name="line.261"></a>
+<span class="sourceLineNo">262</span><a name="line.262"></a>
+<span class="sourceLineNo">263</span>    /**<a name="line.263"></a>
+<span class="sourceLineNo">264</span>     * Replaces the found invalid XML character with the given replacement.<a name="line.264"></a>
+<span class="sourceLineNo">265</span>     * &lt;p&gt;<a name="line.265"></a>
+<span class="sourceLineNo">266</span>     * You may override this method to insert some information about invalid<a name="line.266"></a>
+<span class="sourceLineNo">267</span>     * character in to the character buffer.<a name="line.267"></a>
+<span class="sourceLineNo">268</span>     * <a name="line.268"></a>
+<span class="sourceLineNo">269</span>     * @param characterBuffer<a name="line.269"></a>
+<span class="sourceLineNo">270</span>     */<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    protected int onMatch(StringBuilder characterBuffer) {<a name="line.271"></a>
+<span class="sourceLineNo">272</span><a name="line.272"></a>
+<span class="sourceLineNo">273</span>        String replacement_ = replacement(characterBuffer);<a name="line.273"></a>
+<span class="sourceLineNo">274</span>        characterBuffer.replace(matcher.start(), matcher.end(), replacement_);<a name="line.274"></a>
+<span class="sourceLineNo">275</span><a name="line.275"></a>
+<span class="sourceLineNo">276</span>        // calling reset(..) is redundant as find(start) calls reset() first<a name="line.276"></a>
+<span class="sourceLineNo">277</span>        // if (replacement_.length() != 1) {<a name="line.277"></a>
+<span class="sourceLineNo">278</span>        // matcher.reset(characterBuffer);<a name="line.278"></a>
+<span class="sourceLineNo">279</span>        // }<a name="line.279"></a>
+<span class="sourceLineNo">280</span><a name="line.280"></a>
+<span class="sourceLineNo">281</span>        return matcher.start() + replacement_.length();<a name="line.281"></a>
+<span class="sourceLineNo">282</span><a name="line.282"></a>
+<span class="sourceLineNo">283</span>    }<a name="line.283"></a>
+<span class="sourceLineNo">284</span><a name="line.284"></a>
+<span class="sourceLineNo">285</span>    protected String replacement(StringBuilder characterBuffer) {<a name="line.285"></a>
+<span class="sourceLineNo">286</span>        if (dollarZero) {<a name="line.286"></a>
+<span class="sourceLineNo">287</span><a name="line.287"></a>
+<span class="sourceLineNo">288</span>            // character formatted as "U+\d{4}"<a name="line.288"></a>
+<span class="sourceLineNo">289</span>            char ch = characterBuffer.charAt(matcher.start());<a name="line.289"></a>
+<span class="sourceLineNo">290</span>            String chHex = Integer.toString(ch, 16).toUpperCase();<a name="line.290"></a>
+<span class="sourceLineNo">291</span>            while (chHex.length() &lt; 4) {<a name="line.291"></a>
+<span class="sourceLineNo">292</span>                chHex = "0" + chHex;<a name="line.292"></a>
+<span class="sourceLineNo">293</span>            }<a name="line.293"></a>
+<span class="sourceLineNo">294</span>            chHex = "U+" + chHex;<a name="line.294"></a>
+<span class="sourceLineNo">295</span><a name="line.295"></a>
+<span class="sourceLineNo">296</span>            // TODO should I do some caching of chHex to improve performance?<a name="line.296"></a>
+<span class="sourceLineNo">297</span><a name="line.297"></a>
+<span class="sourceLineNo">298</span>            return replacement.replace("$0", chHex);<a name="line.298"></a>
+<span class="sourceLineNo">299</span>        }<a name="line.299"></a>
+<span class="sourceLineNo">300</span>        else {<a name="line.300"></a>
+<span class="sourceLineNo">301</span>            return replacement;<a name="line.301"></a>
+<span class="sourceLineNo">302</span>        }<a name="line.302"></a>
+<span class="sourceLineNo">303</span>    }<a name="line.303"></a>
+<span class="sourceLineNo">304</span><a name="line.304"></a>
+<span class="sourceLineNo">305</span><a name="line.305"></a>
+<span class="sourceLineNo">306</span>    //<a name="line.306"></a>
+<span class="sourceLineNo">307</span>    // override Object.*<a name="line.307"></a>
+<span class="sourceLineNo">308</span>    //<a name="line.308"></a>
+<span class="sourceLineNo">309</span><a name="line.309"></a>
+<span class="sourceLineNo">310</span><a name="line.310"></a>
+<span class="sourceLineNo">311</span>    /**<a name="line.311"></a>
+<span class="sourceLineNo">312</span>     * @see java.lang.Object#toString()<a name="line.312"></a>
+<span class="sourceLineNo">313</span>     */<a name="line.313"></a>
+<span class="sourceLineNo">314</span>    @Override<a name="line.314"></a>
+<span class="sourceLineNo">315</span>    public String toString() {<a name="line.315"></a>
+<span class="sourceLineNo">316</span>        StringBuilder builder = new StringBuilder();<a name="line.316"></a>
+<span class="sourceLineNo">317</span>        builder.append("InvalidXmlCharacterModifier [\nreplacement=");<a name="line.317"></a>
+<span class="sourceLineNo">318</span>        builder.append(replacement);<a name="line.318"></a>
+<span class="sourceLineNo">319</span>        builder.append(", \nmatcher=");<a name="line.319"></a>
+<span class="sourceLineNo">320</span>        builder.append(matcher);<a name="line.320"></a>
+<span class="sourceLineNo">321</span>        builder.append(", \ndollarZero=");<a name="line.321"></a>
+<span class="sourceLineNo">322</span>        builder.append(dollarZero);<a name="line.322"></a>
+<span class="sourceLineNo">323</span>        builder.append("]");<a name="line.323"></a>
+<span class="sourceLineNo">324</span>        return builder.toString();<a name="line.324"></a>
+<span class="sourceLineNo">325</span>    }<a name="line.325"></a>
+<span class="sourceLineNo">326</span><a name="line.326"></a>
+<span class="sourceLineNo">327</span><a name="line.327"></a>
+<span class="sourceLineNo">328</span>}<a name="line.328"></a>
 
 
 
@@ -389,6 +394,7 @@
 
 
 
-</PRE>
-</BODY>
-</HTML>
+</pre>
+</div>
+</body>
+</html>
